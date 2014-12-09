@@ -109,6 +109,19 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     public static abstract class Direction {
         private Direction() {
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            return getClass().hashCode();
+        }
     }
 
     public static final class Left extends Direction {
@@ -179,7 +192,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
 
         Coords current = new Coords(0, 0);
 
-        if(!containsKey(current)) {
+        if (!containsKey(current)) {
             throw new IllegalStateException("Error in labyrinth! No valid start! Ask for Prof. Hassanen to help you!");
         }
 
@@ -246,7 +259,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
 
         // get out again
         List<Direction> pathOut = findPath(current, new Coords(0, 0));
-        if(pathOut == null) {
+        if (pathOut == null) {
             throw new IllegalStateException("Error in labyrinth! Expedition is trapped! Ask for Prof. Hassanen to help you!");
         }
 
@@ -283,7 +296,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     private List<Direction> findPath(Coords start, Coords end) {
-        if(start.equals(end)) {
+        if (start.equals(end)) {
             return Collections.emptyList();
         }
 
@@ -295,32 +308,32 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         PathNode foundPath = null;
 
         bfs:
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             PathNode node = stack.getFirst();
             Coords currentCoords = node.getCoords();
 
             tryDirections:
-            for(Direction direction : directions) {
-                if(!get(currentCoords).getDirection(direction).isOpen()) {
+            for (Direction direction : directions) {
+                if (!get(currentCoords).getDirection(direction).isOpen()) {
                     continue; // not open passage, skip
                 }
 
                 Coords nextCoords = currentCoords.go(direction);
 
-                if(!containsKey(nextCoords)) {
+                if (!containsKey(nextCoords)) {
                     throw new IllegalStateException("Labyrinth is broken! Passage leads to void! Ask for Prof. Hassanen to help you!");
                 }
 
                 PathNode prior = node;
-                while(prior != null) {
-                    if(prior.getCoords().equals(nextCoords)) {
+                while (prior != null) {
+                    if (prior.getCoords().equals(nextCoords)) {
                         continue tryDirections; // we do not want to run in circles
                     }
                     prior = prior.getParent();
                 }
 
                 PathNode newPath = new PathNode(node, nextCoords, direction);
-                if(nextCoords.equals(end)) {
+                if (nextCoords.equals(end)) {
                     foundPath = newPath;
                     break bfs;
                 }
@@ -329,13 +342,13 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             }
         }
 
-        if(foundPath == null) {
+        if (foundPath == null) {
             return null;
         }
 
         LinkedList<Direction> path = new LinkedList<Direction>();
-        while(foundPath != null) {
-            if(foundPath.getDirection() != null) {
+        while (foundPath != null) {
+            if (foundPath.getDirection() != null) {
                 path.addLast(foundPath.getDirection());
             }
             foundPath = foundPath.getParent();
@@ -344,7 +357,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     public void clearPassages(Map<Coords, Tile> modifiedTiles) {
-        for(Coords c : modifiedTiles.keySet()) {
+        for (Coords c : modifiedTiles.keySet()) {
             checkValidUpdate(c, modifiedTiles);
         }
     }
@@ -366,21 +379,21 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         final Tile baseTile = modifiedTiles.get(base);
         final Tile otherTile = modifiedTiles.containsKey(neighbor) ? modifiedTiles.get(neighbor) : get(neighbor);
 
-        if(base == null) {
+        if (base == null) {
             throw new IllegalArgumentException("You cannot set the tile at " + base + " to be empty!");
         }
 
-        if(oldBaseTile == null) {
+        if (oldBaseTile == null) {
             throw new IllegalArgumentException("You cannot add a new tile at " + base + " to the labyrinth");
         }
 
-        if(oldBaseTile.getDirection(baseDir).isOpen() && !baseTile.getDirection(baseDir).isOpen()) {
+        if (oldBaseTile.getDirection(baseDir).isOpen() && !baseTile.getDirection(baseDir).isOpen()) {
             throw new IllegalArgumentException("You can only open up passages! Not close them!");
         }
 
-        if(!(
+        if (!(
                 (!baseTile.getDirection(baseDir).isOpen() && otherTile == null)
-                || baseTile.getDirection(baseDir).isOpen() == otherTile.getDirection(neighborDir).isOpen())) {
+                        || baseTile.getDirection(baseDir).isOpen() == otherTile.getDirection(neighborDir).isOpen())) {
             throw new IllegalArgumentException("Tiles do not match at " + base + " and " + neighbor + "! Did you check to open up the passage from both directions?");
         }
     }
@@ -446,5 +459,177 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     @Override
     public Set<Entry<Coords, Tile>> entrySet() {
         return unmodifiableMap.entrySet();
+    }
+
+    public static class UnorderedPair extends HashSet<Coords> {
+        public UnorderedPair(Coords a, Coords b) {
+            add(a);
+            add(b);
+        }
+    }
+
+    public String toString(List<Direction> path) {
+        if (isEmpty()) {
+            return "";
+        }
+
+        final Left left = new Left();
+        final Right right = new Right();
+        final Up up = new Up();
+        final Down down = new Down();
+
+        Set<Coords> visited = new HashSet<Coords>();
+        Set<UnorderedPair> moves = new HashSet<UnorderedPair>();
+
+        if (path != null) {
+            Coords current = new Coords(0, 0);
+            visited.add(current);
+
+            for (Direction direction : path) {
+                Coords next = current.go(direction);
+                visited.add(next);
+                moves.add(new UnorderedPair(current, next));
+                current = next;
+            }
+        }
+
+        int xMin = Integer.MAX_VALUE, xMax = Integer.MIN_VALUE, yMin = Integer.MAX_VALUE, yMax = Integer.MIN_VALUE;
+
+        for (Coords coords : keySet()) {
+            xMin = Math.min(coords.getX(), xMin);
+            xMax = Math.max(coords.getX(), xMax);
+            yMin = Math.min(coords.getY(), yMin);
+            yMax = Math.max(coords.getY(), yMax);
+        }
+
+        StringBuilder s = new StringBuilder();
+        StringBuilder s2 = new StringBuilder();
+        StringBuilder s3 = new StringBuilder();
+        for (int y = yMin; y <= yMax; y++) {
+            s2.setLength(0);
+            s3.setLength(0);
+
+            for (int x = xMin; x <= xMax; x++) {
+                Coords c = new Coords(x, y);
+                Tile tile = get(c);
+
+                if (x == xMin) {
+                    // print leftest column
+                    if (y == yMin) {
+                        // print topest leftest corner
+                        if (tile == null) {
+                            s.append(' ');
+                        } else if (tile instanceof Treasure) {
+                            s.append('#');
+                        } else if (x == 0 && y == 0) {
+                            s.append('S');
+                        } else {
+                            s.append('+');
+                        }
+                    }
+                    if (tile == null) {
+                        s2.append(' ');
+                    } else if (tile.getLeft().isOpen()) {
+                        if (moves.contains(new UnorderedPair(c, c.go(left)))) {
+                            s2.append('*');
+                        } else {
+                            s2.append(' ');
+                        }
+                    } else {
+                        s2.append('|');
+                    }
+                    if (tile == null) {
+                        s3.append(' ');
+                    } else if (tile instanceof Treasure) {
+                        s3.append('#');
+                    } else if (x == 0 && y == 0) {
+                        s3.append('S');
+                    } else {
+                        s3.append('+');
+                    }
+                }
+
+                // print middle column
+                if (y == yMin) {
+                    // print top middle
+                    if (tile == null) {
+                        s.append(' ');
+                    } else if (tile.getUp().isOpen()) {
+                        if (moves.contains(new UnorderedPair(c, c.go(up)))) {
+                            s.append('*');
+                        } else {
+                            s.append(' ');
+                        }
+                    } else {
+                        s.append('-');
+                    }
+                }
+                if (tile == null || !visited.contains(c)) {
+                    s2.append(' ');
+                } else {
+                    s2.append('*');
+                }
+                if (tile == null) {
+                    s3.append(' ');
+                } else if (tile.getDown().isOpen()) {
+                    if (moves.contains(new UnorderedPair(c, c.go(down)))) {
+                        s3.append('*');
+                    } else {
+                        s3.append(' ');
+                    }
+                } else {
+                    s3.append('-');
+                }
+
+                // print right column
+                if (y == yMin) {
+                    // print top right
+                    if (tile == null) {
+                        s.append(' ');
+                    } else if (tile instanceof Treasure) {
+                        s.append('#');
+                    } else if (x == 0 && y == 0) {
+                        s.append('S');
+                    } else {
+                        s.append('+');
+                    }
+                }
+                if (tile == null) {
+                    s2.append(' ');
+                } else if (tile.getRight().isOpen()) {
+                    if (moves.contains(new UnorderedPair(c, c.go(right)))) {
+                        s2.append('*');
+                    } else {
+                        s2.append(' ');
+                    }
+                } else {
+                    s2.append('|');
+                }
+                if (tile == null) {
+                    s3.append(' ');
+                } else if (tile instanceof Treasure) {
+                    s3.append('#');
+                } else if (x == 0 && y == 0) {
+                    s3.append('S');
+                } else {
+                    s3.append('+');
+                }
+            }
+
+            if (y == yMin) {
+                s.append('\n');
+            }
+            s.append(s2);
+            s.append('\n');
+            s.append(s3);
+            s.append('\n');
+        }
+
+        return s.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString(null);
     }
 }
