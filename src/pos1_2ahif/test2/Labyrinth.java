@@ -632,4 +632,136 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     public String toString() {
         return toString(null);
     }
+
+    public Labyrinth(Map<Coords, Tile> labyrinth) {
+        this.map.putAll(labyrinth);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new Labyrinth(new HashMap<Coords, Tile>() {{
+            put(new Coords(0, 0), new Tile() {
+                @Override
+                public Passage getLeft() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getRight() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return true;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getUp() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getDown() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+            });
+            put(new Coords(1, 0), new Tile() {
+                @Override
+                public Passage getLeft() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return true;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getRight() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return true;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getUp() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getDown() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+            });
+            put(new Coords(2, 0), new Tile() {
+                @Override
+                public Passage getLeft() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return true;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getRight() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getUp() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+
+                @Override
+                public Passage getDown() {
+                    return new Passage() {
+                        @Override
+                        public boolean isOpen() {
+                            return false;
+                        }
+                    };
+                }
+            });
+        }}));
+    }
 }
