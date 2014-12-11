@@ -110,6 +110,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         private Direction() {
         }
 
+        public abstract Direction getOppositeDirection();
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -122,18 +124,39 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         public int hashCode() {
             return getClass().hashCode();
         }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName();
+        }
     }
 
     public static final class Left extends Direction {
+        @Override
+        public Direction getOppositeDirection() {
+            return new Right();
+        }
     }
 
     public static final class Right extends Direction {
+        @Override
+        public Direction getOppositeDirection() {
+            return new Left();
+        }
     }
 
     public static final class Up extends Direction {
+        @Override
+        public Direction getOppositeDirection() {
+            return new Down();
+        }
     }
 
     public static final class Down extends Direction {
+        @Override
+        public Direction getOppositeDirection() {
+            return new Up();
+        }
     }
 
     public interface Treasure {
@@ -271,6 +294,12 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     private static abstract class TileWithCollectedTreasure extends Tile implements CollectedTreasure {
     }
 
+    private static final Left LEFT = new Left();
+    private static final Right RIGHT = new Right();
+    private static final Up UP = new Up();
+    private static final Down DOWN = new Down();
+    private static final Collection<Direction> DIRECTIONS = Arrays.asList(LEFT, RIGHT, UP, DOWN);
+
     private class PathNode {
         private PathNode parent;
         private Coords coords;
@@ -300,8 +329,6 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             return Collections.emptyList();
         }
 
-        final List<Direction> directions = Arrays.asList(new Left(), new Right(), new Up(), new Down());
-
         LinkedList<PathNode> stack = new LinkedList<PathNode>();
         stack.addLast(new PathNode(null, start, null));
 
@@ -313,7 +340,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             Coords currentCoords = node.getCoords();
 
             tryDirections:
-            for (Direction direction : directions) {
+            for (Direction direction : DIRECTIONS) {
                 if (!get(currentCoords).getDirection(direction).isOpen()) {
                     continue; // not open passage, skip
                 }
@@ -363,15 +390,9 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     private void checkValidUpdate(Coords c, Map<Coords, Tile> modifiedTiles) {
-        final Left left = new Left();
-        final Right right = new Right();
-        final Up up = new Up();
-        final Down down = new Down();
-
-        checkValidUpdate(c, left, c.go(left), right, modifiedTiles);
-        checkValidUpdate(c, right, c.go(right), left, modifiedTiles);
-        checkValidUpdate(c, up, c.go(up), down, modifiedTiles);
-        checkValidUpdate(c, down, c.go(down), up, modifiedTiles);
+        for (Direction direction : DIRECTIONS) {
+            checkValidUpdate(c, direction, c.go(direction), direction.getOppositeDirection(), modifiedTiles);
+        }
     }
 
     private void checkValidUpdate(Coords base, Direction baseDir, Coords neighbor, Direction neighborDir, Map<Coords, Tile> modifiedTiles) {
@@ -473,11 +494,6 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             return "";
         }
 
-        final Left left = new Left();
-        final Right right = new Right();
-        final Up up = new Up();
-        final Down down = new Down();
-
         Set<Coords> visited = new HashSet<Coords>();
         Set<UnorderedPair> moves = new HashSet<UnorderedPair>();
 
@@ -530,7 +546,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                     if (tile == null) {
                         s2.append(' ');
                     } else if (tile.getLeft().isOpen()) {
-                        if (moves.contains(new UnorderedPair(c, c.go(left)))) {
+                        if (moves.contains(new UnorderedPair(c, c.go(LEFT)))) {
                             s2.append('*');
                         } else {
                             s2.append(' ');
@@ -555,7 +571,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                     if (tile == null) {
                         s.append(' ');
                     } else if (tile.getUp().isOpen()) {
-                        if (moves.contains(new UnorderedPair(c, c.go(up)))) {
+                        if (moves.contains(new UnorderedPair(c, c.go(UP)))) {
                             s.append('*');
                         } else {
                             s.append(' ');
@@ -572,7 +588,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                 if (tile == null) {
                     s3.append(' ');
                 } else if (tile.getDown().isOpen()) {
-                    if (moves.contains(new UnorderedPair(c, c.go(down)))) {
+                    if (moves.contains(new UnorderedPair(c, c.go(DOWN)))) {
                         s3.append('*');
                     } else {
                         s3.append(' ');
@@ -597,7 +613,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                 if (tile == null) {
                     s2.append(' ');
                 } else if (tile.getRight().isOpen()) {
-                    if (moves.contains(new UnorderedPair(c, c.go(right)))) {
+                    if (moves.contains(new UnorderedPair(c, c.go(RIGHT)))) {
                         s2.append('*');
                     } else {
                         s2.append(' ');
