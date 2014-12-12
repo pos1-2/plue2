@@ -1,11 +1,6 @@
 package pos1_2ahif.test2;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.CodeSource;
-import java.security.SecureClassLoader;
 import java.util.*;
 
 /**
@@ -14,6 +9,7 @@ import java.util.*;
 public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     public interface Exercises {
         public String getMyName();
+
         public String getMyExamAccountName();
 
         public boolean hasAnyTreasure(Labyrinth labyrinth);
@@ -188,6 +184,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
 
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
         if (!e.hasAnyTreasure(this)) {
+            e.printPlanForTreasureHunt(this, Collections.<Direction>emptyList(), report);
             return Collections.emptyList();
         }
 
