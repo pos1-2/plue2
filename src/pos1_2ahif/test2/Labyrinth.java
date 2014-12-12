@@ -291,6 +291,9 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         return value;
     }
 
+    private static abstract class TileWithTreasure extends Tile implements Treasure {
+    }
+
     private static abstract class TileWithCollectedTreasure extends Tile implements CollectedTreasure {
     }
 
@@ -702,136 +705,70 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         return toString(null);
     }
 
-    public Labyrinth(Map<Coords, Tile> labyrinth) {
-        this.map.putAll(labyrinth);
+    public Labyrinth(Map<Coords, ? extends Tile> labyrinth) {
+        for (Map.Entry<Coords, ? extends Tile> e : labyrinth.entrySet()) {
+            final Tile tile = e.getValue();
+            if (e.getValue() instanceof Treasure) {
+                final Treasure treasure = (Treasure) e.getValue();
+                map.put(e.getKey(), new TileWithTreasure() {
+                    @Override
+                    public Passage getLeft() {
+                        return tile.getLeft();
+                    }
+
+                    @Override
+                    public Passage getRight() {
+                        return tile.getRight();
+                    }
+
+                    @Override
+                    public Passage getUp() {
+                        return tile.getUp();
+                    }
+
+                    @Override
+                    public Passage getDown() {
+                        return tile.getDown();
+                    }
+
+                    @Override
+                    public float getValue() {
+                        return treasure.getValue();
+                    }
+
+                    @Override
+                    public float getWeight() {
+                        return treasure.getWeight();
+                    }
+                });
+            } else {
+                map.put(e.getKey(), new Tile() {
+                    @Override
+                    public Passage getLeft() {
+                        return tile.getLeft();
+                    }
+
+                    @Override
+                    public Passage getRight() {
+                        return tile.getRight();
+                    }
+
+                    @Override
+                    public Passage getUp() {
+                        return tile.getUp();
+                    }
+
+                    @Override
+                    public Passage getDown() {
+                        return tile.getDown();
+                    }
+                });
+            }
+        }
     }
 
     public static void main(String[] args) {
-        Labyrinth l = new Labyrinth(new HashMap<Coords, Tile>() {{
-            put(new Coords(0, 0), new Tile() {
-                @Override
-                public Passage getLeft() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getRight() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return true;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getUp() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getDown() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-            });
-            put(new Coords(1, 0), new Tile() {
-                @Override
-                public Passage getLeft() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return true;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getRight() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return true;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getUp() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getDown() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-            });
-            put(new Coords(2, 0), new Tile() {
-                @Override
-                public Passage getLeft() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return true;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getRight() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getUp() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-
-                @Override
-                public Passage getDown() {
-                    return new Passage() {
-                        @Override
-                        public boolean isOpen() {
-                            return false;
-                        }
-                    };
-                }
-            });
-        }});
+        Labyrinth l = new Generator(80, 25, 0.8f, new Generator.SimpleTreasure(12, 12)).get();
 
         System.out.println(l);
 
