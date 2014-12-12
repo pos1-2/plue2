@@ -301,13 +301,15 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     private static final Collection<Direction> DIRECTIONS = Arrays.asList(LEFT, RIGHT, UP, DOWN);
 
     private class PathNode {
-        private PathNode parent;
-        private Coords coords;
-        private Direction direction;
+        private final PathNode parent;
+        private final Coords coords;
+        private final int cost;
+        private final Direction direction;
 
-        public PathNode(PathNode parent, Coords coords, Direction direction) {
+        public PathNode(PathNode parent, Coords coords, int cost, Direction direction) {
             this.parent = parent;
             this.coords = coords;
+            this.cost = cost;
             this.direction = direction;
         }
 
@@ -319,67 +321,106 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             return coords;
         }
 
+        public int getCost() {
+            return cost;
+        }
+
         public Direction getDirection() {
             return direction;
         }
     }
+
+    private static final int BREAK_WALL_COST = 25;
 
     private List<Direction> findPath(Coords start, Coords end) {
         if (start.equals(end)) {
             return Collections.emptyList();
         }
 
-        LinkedList<PathNode> stack = new LinkedList<PathNode>();
-        stack.addLast(new PathNode(null, start, null));
+        // will store the best path from start to given coords known so far
+        Map<Coords, PathNode> bestPaths = new HashMap<Coords, PathNode>();
 
-        PathNode foundPath = null;
+        // will sort all paths based on their current value, we will expand the path with minimal cost so far
+        NavigableMap<Integer, List<PathNode>> sortedStack = new TreeMap<Integer, List<PathNode>>();
 
-        bfs:
-        while (!stack.isEmpty()) {
-            PathNode node = stack.getFirst();
-            Coords currentCoords = node.getCoords();
+        // start node with no parent, 0 cost, and no direction where we came from
+        PathNode startPath = new PathNode(null, start, 0, null);
+        sortedStack.put(0, new LinkedList<PathNode>(Arrays.asList(startPath)));
+        bestPaths.put(start, startPath);
+
+        while (!sortedStack.isEmpty()) {
+            final Map.Entry<Integer, List<PathNode>> e = sortedStack.firstEntry();
+
+            final PathNode pathSoFar = e.getValue().remove(0);
+
+            if (e.getValue().isEmpty()) {
+                sortedStack.remove(e.getKey());
+            }
+
+            final Coords currentCoords = pathSoFar.getCoords();
+            if (bestPaths.containsKey(currentCoords) && bestPaths.get(currentCoords) != pathSoFar) {
+                // no need to follow this path, there is already another path that is as good or better
+                continue;
+            }
 
             tryDirections:
             for (Direction direction : DIRECTIONS) {
+                final int stepCost;
+
                 if (!get(currentCoords).getDirection(direction).isOpen()) {
-                    continue; // not open passage, skip
+                    stepCost = BREAK_WALL_COST; // not open passage, higher costs to break wall
+                } else {
+                    stepCost = 1;
                 }
 
                 Coords nextCoords = currentCoords.go(direction);
 
                 if (!containsKey(nextCoords)) {
-                    throw new IllegalStateException("Labyrinth is broken! Passage leads to void! Ask for Prof. Hassanen to help you!");
+                    continue; // does not lead to a new tile, skip direction
                 }
 
-                PathNode prior = node;
-                while (prior != null) {
-                    if (prior.getCoords().equals(nextCoords)) {
-                        continue tryDirections; // we do not want to run in circles
+                PathNode newPath = new PathNode(pathSoFar, nextCoords, pathSoFar.getCost() + stepCost, direction);
+
+                // this path must be better than other pathes leading to the same coord
+                // and better as other paths leading to the end
+                // this also prevents cycle, cause each step has cost of 1
+                for (Coords upperBound : Arrays.asList(nextCoords, end)) {
+                    if (bestPaths.containsKey(upperBound) && newPath.getCost() >= bestPaths.get(upperBound).getCost()) {
+                        continue tryDirections; // another path is already as good or superior, disregard this path
                     }
-                    prior = prior.getParent();
                 }
 
-                PathNode newPath = new PathNode(node, nextCoords, direction);
+                bestPaths.put(nextCoords, newPath);
+
                 if (nextCoords.equals(end)) {
-                    foundPath = newPath;
-                    break bfs;
+                    // we found a path leading to the end
+                    for (int key : sortedStack.navigableKeySet().tailSet(newPath.getCost())) {
+                        sortedStack.remove(key); // remove all paths that cannot be better than this one
+                    }
+                    continue; // try other directions, maybe we hopped wall to find end, and there is an easy way around
                 }
 
-                stack.addLast(newPath);
+                if (sortedStack.containsKey(newPath.getCost())) {
+                    sortedStack.get(newPath.getCost()).add(newPath);
+                } else {
+                    sortedStack.put(newPath.getCost(), new LinkedList<PathNode>(Arrays.asList(newPath)));
+                }
             }
         }
 
-        if (foundPath == null) {
+        if (!bestPaths.containsKey(end)) {
+            // no path to end found
             return null;
         }
 
+        PathNode bestPath = bestPaths.get(end);
+
         LinkedList<Direction> path = new LinkedList<Direction>();
-        while (foundPath != null) {
-            if (foundPath.getDirection() != null) {
-                path.addLast(foundPath.getDirection());
-            }
-            foundPath = foundPath.getParent();
+        while (bestPath.getDirection() != null) { // remember: start path had no direction coming from
+            path.addLast(bestPath.getDirection());
+            bestPath = bestPath.getParent();
         }
+
         return path;
     }
 
@@ -666,7 +707,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     public static void main(String[] args) {
-        System.out.println(new Labyrinth(new HashMap<Coords, Tile>() {{
+        Labyrinth l = new Labyrinth(new HashMap<Coords, Tile>() {{
             put(new Coords(0, 0), new Tile() {
                 @Override
                 public Passage getLeft() {
@@ -790,6 +831,10 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                     };
                 }
             });
-        }}));
+        }});
+
+        System.out.println(l);
+
+        System.out.println(l.findPath(new Coords(0, 0), new Coords(2, 0)));
     }
 }
