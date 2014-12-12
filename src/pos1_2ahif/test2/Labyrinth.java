@@ -628,37 +628,60 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                 // if a tile is null, it will be rendered as XXX...
                 // but then the 3rd column and row must be rendered by the next tile to the right and down
                 // because there might be some walls to display
+                // this is also necessary when there is a neighboring special tile because they are
+                // displayed specially as well
 
                 final Coords coords = new Coords(x, y);
                 final Tile tile = get(coords);
 
-                final Coords downCoords;
-                final Tile downTile;
-                final Direction downDirection;
+                Coords downCoords = coords.go(DOWN);
+                Tile downTile = get(downCoords);
+                Direction downDirection = DOWN.getOppositeDirection();
 
-                final Coords rightCoords;
-                final Tile rightTile;
-                final Direction rightDirection;
+                Coords rightCoords = coords.go(RIGHT);
+                Tile rightTile = get(rightCoords);
+                Direction rightDirection = RIGHT.getOppositeDirection();
 
-                final Coords downRightCoords;
-                final Tile downRightTile;
+                Coords downRightCoords = coords.go(DOWN).go(RIGHT);
+                Tile downRightTile = get(downRightCoords);
 
-                if (tile == null) {
-                    downCoords = coords.go(DOWN);
-                    downTile = get(downCoords);
-                    downDirection = DOWN.getOppositeDirection(); // DOWN of coords is same as UP of downCoords
+                Coords tmpCoords = null;
+                Tile tmpTile = null;
 
-                    rightCoords = coords.go(RIGHT);
-                    rightTile = get(rightCoords);
-                    rightDirection = RIGHT.getOppositeDirection(); // RIGHT of coords is same as LEFT of rightCoords
+                // down right is complicated, because it is part of 4 tiles
+                // :( -> we will store most special tile in tmp until we know
 
-                    downRightCoords = coords.go(DOWN).go(RIGHT);
-                    downRightTile = get(downRightCoords);
-                } else {
-                    downCoords = rightCoords = downRightCoords = coords;
+                if (downTile instanceof Treasure || downCoords.equals(new Coords(0, 0))) {
+                    // down tile is special, we will might use it for down right corner
+                    tmpCoords = downCoords;
+                    tmpTile = downTile;
+                } else if (tile != null) {
+                    // no special below, and tile is not null hence we know how to render it
+                    downCoords = coords;
                     downDirection = DOWN;
+                    downTile = tile;
+                }
+                if (rightTile instanceof Treasure || rightCoords.equals(new Coords(0, 0))) {
+                    // right tile is special, we will might use it for down right corner
+                    tmpCoords = rightCoords;
+                    tmpTile = rightTile;
+                } else if (tile != null) {
+                    // no special to the right, and tile is not null hence we know how to render it
+                    rightCoords = coords;
                     rightDirection = RIGHT;
-                    downTile = rightTile = downRightTile = tile;
+                    rightTile = tile;
+                }
+                // reset downright if its not special
+                if (downRightTile instanceof Treasure || downRightCoords.equals(new Coords(0, 0))) {
+                    // downright itself is special, we will render it as it is
+                } else if (tmpTile != null) {
+                    // we found a special tile below or to the right, we will render it
+                    downRightCoords = tmpCoords;
+                    downRightTile = tmpTile;
+                } else if (tile != null) {
+                    // we know how we render the tile directly
+                    downRightCoords = coords;
+                    downRightTile = tile;
                 }
 
                 if (x == xMin) {
@@ -768,7 +791,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     public static void main(String[] args) {
-        Labyrinth l = new Generator(80, 25, 0.8f, new Generator.SimpleTreasure(12, 12)).get();
+        Labyrinth l = new Generator(40, 12, 0.8f, new Generator.SimpleTreasure(12, 12)).get();
 
         System.out.println(l);
 
