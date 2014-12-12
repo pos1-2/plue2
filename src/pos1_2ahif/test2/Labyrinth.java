@@ -83,15 +83,23 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     }
 
     public static abstract class Tile {
-        public abstract Passage getLeft();
+        public Passage getLeft() {
+            return getDirection(new Left());
+        }
 
-        public abstract Passage getRight();
+        public Passage getRight() {
+            return getDirection(new Right());
+        }
 
-        public abstract Passage getUp();
+        public Passage getUp() {
+            return getDirection(new Up());
+        }
 
-        public abstract Passage getDown();
+        public Passage getDown() {
+            return getDirection(new Down());
+        }
 
-        public final Passage getDirection(Direction direction) {
+        public Passage getDirection(Direction direction) {
             if (direction instanceof Left) {
                 return getLeft();
             } else if (direction instanceof Right) {
@@ -245,23 +253,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             alreadyCollected.add(treasurePosition);
             map.put(treasurePosition, new TileWithCollectedTreasure() {
                 @Override
-                public Passage getLeft() {
-                    return tile.getLeft();
-                }
-
-                @Override
-                public Passage getRight() {
-                    return tile.getRight();
-                }
-
-                @Override
-                public Passage getUp() {
-                    return tile.getUp();
-                }
-
-                @Override
-                public Passage getDown() {
-                    return tile.getDown();
+                public Passage getDirection(Direction direction) {
+                    return tile.getDirection(direction);
                 }
 
                 @Override
@@ -735,23 +728,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                 final Treasure treasure = (Treasure) e.getValue();
                 map.put(e.getKey(), new TileWithTreasure() {
                     @Override
-                    public Passage getLeft() {
-                        return tile.getLeft();
-                    }
-
-                    @Override
-                    public Passage getRight() {
-                        return tile.getRight();
-                    }
-
-                    @Override
-                    public Passage getUp() {
-                        return tile.getUp();
-                    }
-
-                    @Override
-                    public Passage getDown() {
-                        return tile.getDown();
+                    public Passage getDirection(Direction direction) {
+                        return tile.getDirection(direction);
                     }
 
                     @Override
@@ -767,23 +745,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             } else {
                 map.put(e.getKey(), new Tile() {
                     @Override
-                    public Passage getLeft() {
-                        return tile.getLeft();
-                    }
-
-                    @Override
-                    public Passage getRight() {
-                        return tile.getRight();
-                    }
-
-                    @Override
-                    public Passage getUp() {
-                        return tile.getUp();
-                    }
-
-                    @Override
-                    public Passage getDown() {
-                        return tile.getDown();
+                    public Passage getDirection(Direction direction) {
+                        return tile.getDirection(direction);
                     }
                 });
             }
