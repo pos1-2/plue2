@@ -489,6 +489,58 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         }
     }
 
+    private static char getCornerPieceForTile(Tile tile, Coords coords) {
+        if (coords.getX() == 0 && coords.getY() == 0) { // start
+            return 'S';
+        } else if (tile == null) {
+            return 'X';
+        } else if (tile instanceof Treasure) {
+            return '#';
+        } else {
+            return '+';
+        }
+    }
+
+    private static char getEdgePieceForTile(Tile tile, Direction direction) {
+        if (tile == null) {
+            return 'X';
+        } else if (tile.getDirection(direction).isOpen()) {
+            return ' ';
+        } else if (direction instanceof Left || direction instanceof Right) {
+            return '|';
+        } else {
+            return '-';
+        }
+    }
+
+    private static char getEdgePieceForTileAndPath(Tile tile, Coords coords, Direction direction, Set<UnorderedPair> moves) {
+        if (moves.contains(new UnorderedPair(coords, coords.go(direction)))) {
+            return '*';
+        } else {
+            return getEdgePieceForTile(tile, direction);
+        }
+    }
+
+    private static char getMidPieceForTile(Tile tile, Coords coords) {
+        if (coords.getX() == 0 && coords.getY() == 0) {
+            return 'S';
+        } else if (tile == null) {
+            return 'X';
+        } else if (tile instanceof Treasure) {
+            return '#';
+        } else {
+            return ' ';
+        }
+    }
+
+    private static char getMidPieceForTileAndPath(Tile tile, Coords coords, Set<Coords> visited) {
+        if (visited.contains(coords)) {
+            return '*';
+        } else {
+            return getMidPieceForTile(tile, coords);
+        }
+    }
+
     public String toString(List<Direction> path) {
         if (isEmpty()) {
             return "";
@@ -526,110 +578,70 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             s3.setLength(0);
 
             for (int x = xMin; x <= xMax; x++) {
-                Coords c = new Coords(x, y);
-                Tile tile = get(c);
+                // every field is 3x3 characters
+                // each field is responsible for drowing rows and cols 2 & 3
+                // the first row and first col in addition will draw its 1st row and col
+                // if a tile is null, it will be rendered as XXX...
+                // but then the 3rd column and row must be rendered by the next tile to the right and down
+                // because there might be some walls to display
+
+                final Coords coords = new Coords(x, y);
+                final Tile tile = get(coords);
+
+                final Coords downCoords;
+                final Tile downTile;
+                final Direction downDirection;
+
+                final Coords rightCoords;
+                final Tile rightTile;
+                final Direction rightDirection;
+
+                final Coords downRightCoords;
+                final Tile downRightTile;
+
+                if (tile == null) {
+                    downCoords = coords.go(DOWN);
+                    downTile = get(downCoords);
+                    downDirection = DOWN.getOppositeDirection(); // DOWN of coords is same as UP of downCoords
+
+                    rightCoords = coords.go(RIGHT);
+                    rightTile = get(rightCoords);
+                    rightDirection = RIGHT.getOppositeDirection(); // RIGHT of coords is same as LEFT of rightCoords
+
+                    downRightCoords = coords.go(DOWN).go(RIGHT);
+                    downRightTile = get(downRightCoords);
+                } else {
+                    downCoords = rightCoords = downRightCoords = coords;
+                    downDirection = DOWN;
+                    rightDirection = RIGHT;
+                    downTile = rightTile = downRightTile = tile;
+                }
 
                 if (x == xMin) {
                     // print leftest column
                     if (y == yMin) {
                         // print topest leftest corner
-                        if (tile == null) {
-                            s.append(' ');
-                        } else if (tile instanceof Treasure) {
-                            s.append('#');
-                        } else if (x == 0 && y == 0) {
-                            s.append('S');
-                        } else {
-                            s.append('+');
-                        }
+                        s.append(getCornerPieceForTile(tile, coords));
                     }
-                    if (tile == null) {
-                        s2.append(' ');
-                    } else if (tile.getLeft().isOpen()) {
-                        if (moves.contains(new UnorderedPair(c, c.go(LEFT)))) {
-                            s2.append('*');
-                        } else {
-                            s2.append(' ');
-                        }
-                    } else {
-                        s2.append('|');
-                    }
-                    if (tile == null) {
-                        s3.append(' ');
-                    } else if (tile instanceof Treasure) {
-                        s3.append('#');
-                    } else if (x == 0 && y == 0) {
-                        s3.append('S');
-                    } else {
-                        s3.append('+');
-                    }
+                    s2.append(getEdgePieceForTileAndPath(tile, coords, LEFT, moves));
+                    s3.append(getCornerPieceForTile(downTile, downCoords));
                 }
 
                 // print middle column
                 if (y == yMin) {
                     // print top middle
-                    if (tile == null) {
-                        s.append(' ');
-                    } else if (tile.getUp().isOpen()) {
-                        if (moves.contains(new UnorderedPair(c, c.go(UP)))) {
-                            s.append('*');
-                        } else {
-                            s.append(' ');
-                        }
-                    } else {
-                        s.append('-');
-                    }
+                    s.append(getEdgePieceForTileAndPath(tile, coords, UP, moves));
                 }
-                if (tile == null || !visited.contains(c)) {
-                    s2.append(' ');
-                } else {
-                    s2.append('*');
-                }
-                if (tile == null) {
-                    s3.append(' ');
-                } else if (tile.getDown().isOpen()) {
-                    if (moves.contains(new UnorderedPair(c, c.go(DOWN)))) {
-                        s3.append('*');
-                    } else {
-                        s3.append(' ');
-                    }
-                } else {
-                    s3.append('-');
-                }
+                s2.append(getMidPieceForTileAndPath(tile, coords, visited));
+                s3.append(getEdgePieceForTileAndPath(downTile, downCoords, downDirection, moves));
 
                 // print right column
                 if (y == yMin) {
                     // print top right
-                    if (tile == null) {
-                        s.append(' ');
-                    } else if (tile instanceof Treasure) {
-                        s.append('#');
-                    } else if (x == 0 && y == 0) {
-                        s.append('S');
-                    } else {
-                        s.append('+');
-                    }
+                    s.append(getCornerPieceForTile(rightTile, rightCoords));
                 }
-                if (tile == null) {
-                    s2.append(' ');
-                } else if (tile.getRight().isOpen()) {
-                    if (moves.contains(new UnorderedPair(c, c.go(RIGHT)))) {
-                        s2.append('*');
-                    } else {
-                        s2.append(' ');
-                    }
-                } else {
-                    s2.append('|');
-                }
-                if (tile == null) {
-                    s3.append(' ');
-                } else if (tile instanceof Treasure) {
-                    s3.append('#');
-                } else if (x == 0 && y == 0) {
-                    s3.append('S');
-                } else {
-                    s3.append('+');
-                }
+                s2.append(getEdgePieceForTileAndPath(rightTile, rightCoords, rightDirection, moves));
+                s3.append(getCornerPieceForTile(downRightTile, downRightCoords));
             }
 
             if (y == yMin) {
