@@ -1,6 +1,7 @@
 package pos1_2ahif.test2;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Created by Florian on 12.12.2014.
@@ -10,14 +11,19 @@ public final class Main {
     }
 
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Labyrinth l = new Generator(40, 12, 0.8f, new Generator.SimpleTreasure(12, 12)).get();
-
         ClassLoader s = new Assets.SolutionLoader(Labyrinth.class.getClassLoader());
 
         Labyrinth.Exercises referenceSolution = (Labyrinth.Exercises) s.loadClass("pos1_2ahif.test2.ReferenceSolution").newInstance();
 
         Solution solution = new Solution(referenceSolution);
 
-        l.explore(solution, 1000, new File("report.txt"));
+        for (Map.Entry<String, Labyrinth> e : Assets.labyrinths().entrySet()) {
+            System.out.println("Exploring " + e.getKey() + "...");
+
+            Labyrinth l = e.getValue();
+
+            l.explore(solution, 5f, new File(e.getKey() + ".txt"));
+        }
+        System.out.println("Done!");
     }
 }

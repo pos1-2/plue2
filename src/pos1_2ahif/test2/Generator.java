@@ -51,8 +51,29 @@ public class Generator {
     }
 
 
-    public Labyrinth get() {
-        return new Labyrinth(map);
+    private static int pass2int(Labyrinth.Passage x) {
+        return x.isOpen() ? 1 : 0;
+    }
+
+    private static String tile2string(MyTile t) {
+        return pass2int(t.getLeft()) + ","
+                + pass2int(t.getRight()) + ","
+                + pass2int(t.getUp()) + ","
+                + pass2int(t.getDown())
+                + ((t instanceof Labyrinth.Treasure) ? ("," + ((Labyrinth.Treasure) t).getValue() + "f," + ((Labyrinth.Treasure) t).getWeight() + "f") : "");
+    }
+
+    public Labyrinth get(String name) {
+        Labyrinth l = new Labyrinth(map);
+
+        System.out.println("labs.put(\"" + name + "\", new Labyrinth(new HashMap<Coords, Tile>() {{");
+        for (Map.Entry<Labyrinth.Coords, MyTile> e : map.entrySet()) {
+            System.out.println("put(c(" + e.getKey().getX() + "," + e.getKey().getY() + "), t(" + tile2string(e.getValue()) + "));");
+        }
+        System.out.println("}}));");
+
+        System.out.println(l.toString());
+        return l;
     }
 
     private Labyrinth.Coords randomCoords() {
@@ -284,5 +305,24 @@ public class Generator {
         public float getWeight() {
             return weight;
         }
+    }
+
+    private static Labyrinth.Treasure t(final float value, final float weight) {
+        return new Labyrinth.Treasure() {
+            @Override
+            public float getValue() {
+                return value;
+            }
+
+            @Override
+            public float getWeight() {
+                return weight;
+            }
+        };
+    }
+
+    public static void main(String[] args) {
+        Generator g = new Generator(35, 15, 0.8f, t(4, 8), t(3, 1), t(13, 1), t(2, 1), t(1, 1), t(1, 7));
+        g.get("l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7");
     }
 }
