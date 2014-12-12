@@ -397,9 +397,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
 
                 if (nextCoords.equals(end)) {
                     // we found a path leading to the end
-                    for (int key : sortedStack.navigableKeySet().tailSet(newPath.getCost())) {
-                        sortedStack.remove(key); // remove all paths that cannot be better than this one
-                    }
+                    // remove all paths that cannot be better than this one
+                    sortedStack.navigableKeySet().tailSet(newPath.getCost()).clear();
                     continue; // try other directions, maybe we hopped wall to find end, and there is an easy way around
                 }
 
@@ -424,6 +423,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
             bestPath = bestPath.getParent();
         }
 
+        Collections.reverse(path);
         return path;
     }
 
