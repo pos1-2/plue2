@@ -1,6 +1,11 @@
 package pos1_2ahif.test2;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.CodeSource;
+import java.security.SecureClassLoader;
 import java.util.*;
 
 /**
@@ -8,13 +13,16 @@ import java.util.*;
  */
 public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
     public interface Exercises {
+        public String getMyName();
+        public String getMyExamAccountName();
+
         public boolean hasAnyTreasure(Labyrinth labyrinth);
 
         public List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
 
         public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
 
-        public Map<Coords, Tile> clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
+        public void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
 
         public List<Direction> joinPaths(List<List<Direction>> paths);
 
@@ -208,7 +216,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
 
         List<Direction> path = e.joinPaths(betterRoute);
 
-        clearPassages(e.clearPassagesAlongPath(this, path));
+        e.clearPassagesAlongPath(this, path);
 
         e.printPlanForTreasureHunt(this, path, report);
 
@@ -753,13 +761,5 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
                 });
             }
         }
-    }
-
-    public static void main(String[] args) {
-        Labyrinth l = new Generator(40, 12, 0.8f, new Generator.SimpleTreasure(12, 12)).get();
-
-        System.out.println(l);
-
-        System.out.println(l.findPath(new Coords(0, 0), new Coords(2, 0)));
     }
 }
