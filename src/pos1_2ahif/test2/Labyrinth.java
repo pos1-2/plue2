@@ -424,6 +424,8 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         for (Coords c : modifiedTiles.keySet()) {
             checkValidUpdate(c, modifiedTiles);
         }
+
+        map.putAll(modifiedTiles);
     }
 
     private void checkValidUpdate(Coords c, Map<Coords, Tile> modifiedTiles) {
