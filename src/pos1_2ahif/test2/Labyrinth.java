@@ -326,7 +326,7 @@ public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
         }
     }
 
-    private static final int BREAK_WALL_COST = 25;
+    private static final int BREAK_WALL_COST = 10;
 
     private List<Direction> findPath(Coords start, Coords end) {
         if (start.equals(end)) {
