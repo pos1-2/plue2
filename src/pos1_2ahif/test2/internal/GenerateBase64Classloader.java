@@ -1,4 +1,4 @@
-package pos1_2ahif.test2;
+package pos1_2ahif.test2.internal;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
@@ -8,8 +8,8 @@ import java.nio.file.Files;
 /**
  * Created by Florian on 12.12.2014.
  */
-public class Helper {
-    public Helper() throws IOException {
+public class GenerateBase64ClassLoader {
+    public GenerateBase64ClassLoader() throws IOException {
         for (File f : new File("build/cl/main/pos1_2ahif/test2").listFiles()) {
             if (f.getName().startsWith("ReferenceSolution")) {
                 String className = "pos1_2ahif.test2." + f.getName().replace(".class", "");
@@ -21,6 +21,6 @@ public class Helper {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        new Helper();
+        new GenerateBase64ClassLoader();
     }
 }
