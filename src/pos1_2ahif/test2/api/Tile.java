@@ -1,36 +1,34 @@
 package pos1_2ahif.test2.api;
 
-import pos1_2ahif.test2.impl.BFSLabyrinth;
-
 /**
  * Created by Florian on 13.12.2014.
  */
 public abstract class Tile {
-    public BFSLabyrinth.Passage getLeft() {
-        return getDirection(new Left());
+    public boolean isLeftOpen() {
+        return isDirectionOpen(new Left());
     }
 
-    public BFSLabyrinth.Passage getRight() {
-        return getDirection(new Right());
+    public boolean isRightOpen() {
+        return isDirectionOpen(new Right());
     }
 
-    public BFSLabyrinth.Passage getUp() {
-        return getDirection(new Up());
+    public boolean isUpOpen() {
+        return isDirectionOpen(new Up());
     }
 
-    public BFSLabyrinth.Passage getDown() {
-        return getDirection(new Down());
+    public boolean isDownOpen() {
+        return isDirectionOpen(new Down());
     }
 
-    public BFSLabyrinth.Passage getDirection(Direction direction) {
+    public boolean isDirectionOpen(Direction direction) {
         if (direction instanceof Left) {
-            return getLeft();
+            return isLeftOpen();
         } else if (direction instanceof Right) {
-            return getRight();
+            return isRightOpen();
         } else if (direction instanceof Up) {
-            return getUp();
+            return isUpOpen();
         } else if (direction instanceof Down) {
-            return getDown();
+            return isDownOpen();
         } else {
             throw new IllegalArgumentException("Unexpected direction to get: " + direction);
         }

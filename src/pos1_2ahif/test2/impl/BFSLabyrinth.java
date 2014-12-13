@@ -10,12 +10,7 @@ import java.util.*;
  */
 public final class BFSLabyrinth implements Labyrinth {
 
-    public interface Passage {
-        boolean isOpen();
-    }
-
     // see here, how your interface is used:
-
     @Override
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
         if (!e.hasAnyTreasure(this)) {
@@ -93,8 +88,8 @@ public final class BFSLabyrinth implements Labyrinth {
             alreadyCollected.add(treasurePosition);
             map.put(treasurePosition, new TileWithCollectedTreasure() {
                 @Override
-                public Passage getDirection(Direction direction) {
-                    return tile.getDirection(direction);
+                public boolean isDirectionOpen(Direction direction) {
+                    return tile.isDirectionOpen(direction);
                 }
 
                 @Override
@@ -203,7 +198,7 @@ public final class BFSLabyrinth implements Labyrinth {
             for (Direction direction : DIRECTIONS) {
                 final int stepCost;
 
-                if (!get(currentCoords).getDirection(direction).isOpen()) {
+                if (!get(currentCoords).isDirectionOpen(direction)) {
                     stepCost = BREAK_WALL_COST; // not open passage, higher costs to break wall
                 } else {
                     stepCost = 1;
@@ -288,13 +283,13 @@ public final class BFSLabyrinth implements Labyrinth {
             throw new IllegalArgumentException("You cannot add a new tile at " + base + " to the labyrinth");
         }
 
-        if (oldBaseTile.getDirection(baseDir).isOpen() && !baseTile.getDirection(baseDir).isOpen()) {
+        if (oldBaseTile.isDirectionOpen(baseDir) && !baseTile.isDirectionOpen(baseDir)) {
             throw new IllegalArgumentException("You can only open up passages! Not close them!");
         }
 
         if (!(
-                (!baseTile.getDirection(baseDir).isOpen() && otherTile == null)
-                        || baseTile.getDirection(baseDir).isOpen() == otherTile.getDirection(neighborDir).isOpen())) {
+                (!baseTile.isDirectionOpen(baseDir) && otherTile == null)
+                        || baseTile.isDirectionOpen(baseDir) == otherTile.isDirectionOpen(neighborDir))) {
             throw new IllegalArgumentException("Tiles do not match at " + base + " and " + neighbor + "! Did you check to open up the passage from both directions?");
         }
     }
@@ -384,7 +379,7 @@ public final class BFSLabyrinth implements Labyrinth {
     private static char getEdgePieceForTile(Tile tile, Direction direction) {
         if (tile == null) {
             return 'X';
-        } else if (tile.getDirection(direction).isOpen()) {
+        } else if (tile.isDirectionOpen(direction)) {
             return ' ';
         } else if (direction instanceof Left || direction instanceof Right) {
             return '|';
@@ -572,8 +567,8 @@ public final class BFSLabyrinth implements Labyrinth {
                 final Treasure treasure = (Treasure) e.getValue();
                 map.put(e.getKey(), new TileWithTreasure() {
                     @Override
-                    public Passage getDirection(Direction direction) {
-                        return tile.getDirection(direction);
+                    public boolean isDirectionOpen(Direction direction) {
+                        return tile.isDirectionOpen(direction);
                     }
 
                     @Override
@@ -589,8 +584,8 @@ public final class BFSLabyrinth implements Labyrinth {
             } else {
                 map.put(e.getKey(), new Tile() {
                     @Override
-                    public Passage getDirection(Direction direction) {
-                        return tile.getDirection(direction);
+                    public boolean isDirectionOpen(Direction direction) {
+                        return tile.isDirectionOpen(direction);
                     }
                 });
             }

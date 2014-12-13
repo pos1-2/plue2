@@ -35,10 +35,10 @@ Der Eingang ist mit `S` markiert, und Schätze mit `#`.
 In Java ist es folgendermaßen modelliert:
 
 ```
-class Labyrinth implements Map<Coords, Tile>
+interface Labyrinth extends Map<Coords, Tile>
 ```
 
-Ein `Labyrint` ist also eine `Map` mit Koordinaten (`Coords`) als Keys und Abschnitten (`Tile`) als Values.
+Ein `Labyrinth` ist also eine `Map` mit Koordinaten (`Coords`) als Keys und Abschnitten (`Tile`) als Values.
 
 Koordinaten sind, wie üblich, ein geordnetes Paar an `int`s. Wobei der erste `X` und der zweite `Y` genannt wird.
 In der Grafik oben, sehen Sie die beiden zugehörigen Achsen eingezeichnet.
@@ -49,15 +49,15 @@ Der Eingang des Labyrinths liegt _immer_ auf `[0,0]`. Sie erstellen eine Koordin
 Schauen wir uns den Labyrinth-Abschnitt an:
 ```
 abstract class Tile {
-    public Passage getLeft() { ... }
-    public Passage getRight() { ... }
-    public Passage getUp() { ... }
-    public Passage getDown() { ... }
-    public Passage getDirection(Direction direction) { ... }
+    public boolean isLeftOpen() { ... }
+    public boolean isRightOpen() { ... }
+    public boolean isUpOpen() { ... }
+    public boolean isDownOpen() { ... }
+    public boolean isDirectionOpen(Direction direction) { ... }
 }
 ```
-Ein Abschnitt wird beschrieben durch 4 Passagen/Durchgänge, jeweils in die Richtungen Links, Rechts, Oben, Unten.
-Das zB ist ein Abschnitt mit 2 offnen Passagen - Links und Unten - und 2 geschlossenen Passagen - Oben und Rechts.
+Ein Abschnitt wird beschrieben durch 4 Durchgänge (zu einem anderen Abschnitt), jeweils in die Richtungen Links, Rechts, Oben, Unten.
+Das zB ist ein Abschnitt mit 2 offnen Durchgängen - Links und Unten - und 2 geschlossenen Durchgängen - Oben und Rechts.
 ```
 +-+
   |
@@ -78,7 +78,7 @@ Direction left = new Left();
 Sie können bei dem `Tile` auf 2 Arten auf eine Passage zugreifen:
 ```
 Tile t = ...;
-if (t.getLeft() == t.getDirection(new Left())) {
+if (t.isLeftOpen() == t.isDirectionOpen(new Left())) {
     // das ist gleichwertig
 }
 ```
@@ -265,13 +265,13 @@ __Tipp__ Die `Coords` Klasse implementiert die `go` Methode, die gut mit Directi
 ```
 Coords c = new Coords(0,0);
 Coords d = c.go(new Left()); // d = (x = -1, y = 0)
-Coords e = d.go(new Up());   // e = (x = -1, y = 1)
+Coords e = d.go(new Down());   // e = (x = -1, y = 1)
 ...
 ```
 
 __Tipp__ Sie dürfen die Methode `clearPassages` so oft aufrufen, wie Sie wollen. Am leichtesten ist es, diese für jede gesprengte Wand einzeln aufzurufen (jedes mal mit genau 2 Einträgen, denn jede gesprengte `Passage` betrifft immer genau 2 `Tile`s).
 
-__Tipp__ Wenn Sie die Klasse `Tile` ableiten, können Sie sich aussuchen ob Sie entweder nur `getDirection` oder alle 4 `getLeft`, `getRight`, `getUp`, `getDown` implementieren. Wie es Ihnen lieber ist.
+__Tipp__ Wenn Sie die Klasse `Tile` ableiten, können Sie sich aussuchen ob Sie entweder nur `isDirectionOpen` oder alle 4 `isLeftOpen`, `isRightOpen`, `isUpOpen`, `isDownOpen` implementieren. Wie es Ihnen lieber ist.
 
 __Tipp__ Die `Directions` Klasse implementiert die `getOppositeDirection` Methode, die Ihnen die genau entgegengesetzte Richtung liefert:
 ```

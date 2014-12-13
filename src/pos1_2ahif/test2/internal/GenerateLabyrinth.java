@@ -54,15 +54,15 @@ public class GenerateLabyrinth {
     }
 
 
-    private static int pass2int(BFSLabyrinth.Passage x) {
-        return x.isOpen() ? 1 : 0;
+    private static int bool2int(boolean b) {
+        return b ? 1 : 0;
     }
 
     private static String tile2string(MyTile t) {
-        return pass2int(t.getLeft()) + ","
-                + pass2int(t.getRight()) + ","
-                + pass2int(t.getUp()) + ","
-                + pass2int(t.getDown())
+        return bool2int(t.isLeftOpen()) + ","
+                + bool2int(t.isRightOpen()) + ","
+                + bool2int(t.isUpOpen()) + ","
+                + bool2int(t.isDownOpen())
                 + ((t instanceof Treasure) ? ("," + ((Treasure) t).getValue() + "f," + ((Treasure) t).getWeight() + "f") : "");
     }
 
@@ -110,7 +110,7 @@ public class GenerateLabyrinth {
         Direction d;
         while (true) {
             d = random();
-            if (map.get(start).getDirection(d).isOpen()) {
+            if (map.get(start).isDirectionOpen(d)) {
                 start = start.go(d);
             } else if (canExpand(start, d)) {
                 break;
@@ -134,19 +134,19 @@ public class GenerateLabyrinth {
 
         nextStep:
         while (true) {
-            ((MyPassage) map.get(cur).getDirection(d)).setOpen(true);
+            map.get(cur).setDirectionOpen(d, true);
             cur = cur.go(d);
 
             if (!map.containsKey(cur)) {
                 map.put(cur, new MyTile(false, false, false, false));
                 expand(cur);
             }
-            ((MyPassage) map.get(cur).getDirection(d.getOppositeDirection())).setOpen(true);
+            map.get(cur).setDirectionOpen(d.getOppositeDirection(), true);
 
             Collections.shuffle(ds);
 
             for (Direction dd : ds) {
-                if (!map.get(cur).getDirection(dd).isOpen() && shallContinue(cur, dd)) {
+                if (!map.get(cur).isDirectionOpen(dd) && shallContinue(cur, dd)) {
                     d = dd;
                     continue nextStep;
                 }
@@ -205,7 +205,7 @@ public class GenerateLabyrinth {
             expand(coords);
         } else {
             for (Direction d : DIRECTIONS) {
-                map.get(coords).getUp().setOpen(true);
+                map.get(coords).setDirectionOpen(d, true);
             }
         }
 
@@ -217,7 +217,7 @@ public class GenerateLabyrinth {
                 expand(c);
             }
 
-            ((MyPassage) map.get(c).getDirection(d.getOppositeDirection())).setOpen(true);
+            map.get(c).setDirectionOpen(d.getOppositeDirection(), true);
         }
     }
 
@@ -237,51 +237,48 @@ public class GenerateLabyrinth {
         putCross(coords);
     }
 
-    private static class MyPassage implements BFSLabyrinth.Passage {
-        boolean open;
-
-        public MyPassage(boolean open) {
-            this.open = open;
-        }
-
-        @Override
-        public boolean isOpen() {
-            return open;
-        }
-
-        public void setOpen(boolean open) {
-            this.open = open;
-        }
-    }
-
     private static class MyTile extends Tile {
-        MyPassage left, right, up, down;
+        boolean left, right, up, down;
 
         public MyTile(boolean left, boolean right, boolean up, boolean down) {
-            this.left = new MyPassage(left);
-            this.right = new MyPassage(right);
-            this.up = new MyPassage(up);
-            this.down = new MyPassage(down);
+            this.left = left;
+            this.right = right;
+            this.up = up;
+            this.down = down;
         }
 
         @Override
-        public MyPassage getLeft() {
+        public boolean isLeftOpen() {
             return left;
         }
 
         @Override
-        public MyPassage getRight() {
+        public boolean isRightOpen() {
             return right;
         }
 
         @Override
-        public MyPassage getUp() {
+        public boolean isUpOpen() {
             return up;
         }
 
         @Override
-        public MyPassage getDown() {
+        public boolean isDownOpen() {
             return down;
+        }
+
+        public void setDirectionOpen(Direction d, boolean open) {
+            if (d instanceof Left) {
+                left = open;
+            } else if (d instanceof Right) {
+                right = open;
+            } else if (d instanceof Up) {
+                up = open;
+            } else if (d instanceof Down) {
+                down = open;
+            } else {
+                throw new RuntimeException("no such direction: " + d);
+            }
         }
     }
 
