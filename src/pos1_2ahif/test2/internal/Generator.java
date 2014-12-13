@@ -1,4 +1,4 @@
-package pos1_2ahif.test2;
+package pos1_2ahif.test2.internal;
 
 import pos1_2ahif.test2.api.*;
 import pos1_2ahif.test2.impl.BFSLabyrinth;
