@@ -1,4 +1,4 @@
-package pos1_2ahif.test2;
+package pos1_2ahif.test2.impl;
 
 import pos1_2ahif.test2.impl.BFSLabyrinth;
 import pos1_2ahif.test2.impl.BFSLabyrinth.Passage;

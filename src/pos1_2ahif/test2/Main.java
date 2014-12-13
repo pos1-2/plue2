@@ -1,5 +1,6 @@
 package pos1_2ahif.test2;
 
+import pos1_2ahif.test2.impl.Assets;
 import pos1_2ahif.test2.api.Exercises;
 import pos1_2ahif.test2.api.Labyrinth;
 
