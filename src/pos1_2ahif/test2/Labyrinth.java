@@ -14,9 +14,6 @@ public final class Labyrinth implements Map<Coords, Tile> {
         boolean isOpen();
     }
 
-    public interface CollectedTreasure extends Treasure {
-    }
-
     // see here, how your interface is used:
 
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
