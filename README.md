@@ -14,19 +14,19 @@ Ihr Trupp muss einen Weg durch das Labyrinth finden und natürlich so viele Sch�
 So schaut ein Labyrint aus:
 
 ```
-     <<--------------------------- x - Achse ------------------->>
-           -3-2-1 0 1 2 3
-^    XX+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+XXXXXXX+-+-+-+XXXXXXXX
-^ -2 XX|     |           |                 |XXXXXXX|     |XXXXXXXX
-y -1 +-+ +-+ + +-S S-+-+ + +-+-+-+-+-+-+-+ +X+-+-+-+ +-+ +XXXXXXXX
--  0 |   |X|   |  S  | |   |   |XXXXX|   | |X|         | |XXXXXXXX
-A  1 + +-+-+-+-+-S S-+ +-+-+ +-+-+-+-+ + + +X+ +-+-+ + + +XXX+-XXX
-c  2 |   |   |   | |     |   |   | |   |   |X| |     |   |XXX| |XX
-h    +-+ + + + +-+-+ + + + +-+ + # # +-+ +-+-+ + +-+ # #-+X+-# #-X
-s    | |   | |     | |   |   | |  #  |     |     |    #  |X|  #  |
-e    + +-+-+ +-+-+ + + + + + + +-# # + + + + + +-+ +-# #-+XX-# #-+
-v    |       |XXX|   |       |   | |   | |         |X| |XXXXX| |XX
-v    +-+-+-+-+XXXX-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+XX-+XXXXXX-+XX
+     <<------------------------------ x - Achse ------------------------------->>
+         -3 -2 -1  0  1  2  3
+^    +--+--+--+--+--+--+--+--+--+XX+--+--+--+XX+--+--+XXXXXXXXXXXXXXXXXXXXXXXXXXX
+^ -1 |        |  |              |XX|        |XX|     |XXXXXXXXXXXXXXXXXXXXXXXXXXX
+y    +--+--+  +  S  S--+  +--+  +--+  +--+  +--+  +  +--+--+--+--+--+--XXXXXXXXXX
+-  0 |     |      SS   |  |XX|     |  |           |     |        |     |XXXXXXXXX
+A    +  +  +  +--S  S--+  +--X--+  +  +  +  +--+--+--+  +  +--+  +  +  +--+--XXXX
+c  1 |  |  |  |        |     |XX|     |  |     |     |        |     |     |  |XXX
+h    +  +  +  +  +--+  +--+  +--+--+--+  +--+  +  +  +  +--+  +--+--+  +  #  #--X
+s  2 |        |  |     |              |  |     |  |  |     |        |      ##   |
+e    +  +  +  +  +  +--+  +  +--+--+  +  +  +--+  +  +--+--+--+--+  +  +  #  #  +
+v  3 |           |        |        |     |        |                 |        |  |
+v    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 ```
 
 `|`, `+`, `-` sind dabei Wände, `X` ist nicht zugänglich (z.B. Felsen), ` ` ist ein zugängliche Stelle.
@@ -209,9 +209,9 @@ Betrachten Sie folgende Liste:
 [Left Up Right Right Right]
 ```
 Das beschreibt folgenden Weg: 
-- Zuerst nehmen wir die linke Passage
-- Dann die obere
-- Und dann 3x hintereinander die rechte Passage
+- Zuerst nehmen wir den linken Durchgang
+- Dann den oberen
+- Und dann 3x hintereinander den rechten Durchgang
 
 Die Methode bekommt nun eine Liste solcher Wege (also eine Liste an Listen!), und soll diese zu einen einzigen langen Weg zusammenfassen. Etwa so: (Pseudo Code)
 
@@ -233,7 +233,7 @@ void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path)
 
 Diese Methode bekommt zusätzlich zum `labyrinth`, den `path` (Pfad) den Ihr Trupp beschlossen hat zu beschreiten.
 
-Testen Sie, ob irgendwelche Wände im Weg sind (d.h. die `Passage` ist __nicht__ geöffnet - also `isOpen() == false`).
+Testen Sie, ob irgendwelche Wände im Weg sind (d.h. die `Passage` ist __nicht__ geöffnet - z.B. `tile.isLeftOpen() == false`).
 
 Wenn ja, dann bleibt Ihnen nichts anderes über als diese zu entfernen: `Labyrinth` bietet dafür die Methode
 
@@ -248,13 +248,13 @@ die Sie dafür verwenden sollen.
 
 Diese Methode funktioniert gleich wie `Map.putAll`, überprüft aber, ob Sie das `Labyrinth` in einem konsistenten Zustand hinterlassen:
 
-Jede `Passage` verbindet 2 `Tile`s. Wenn Sie eine `Passage` öffnen, müssen Sie das daher __IMMER__ von beiden Seiten machen (eine geschlossene Passage ist ja dann von beiden Seiten geöffnet).
+Jeder Durchgang verbindet 2 `Tile`s. Wenn Sie eine Durchgang sprengen, müssen Sie das daher sicherstellen, dass der Durchgang von beiden Seiten (beiden `Tile`s) geöffnet ist!
 
 Rufen Sie `clearPassages` mit einer `Map` auf, die beschreibt welche `Tile`s Sie wie ersetzen möchten.
 
 Sollten Ihre Änderungen konsistent sein, wird das `labyrinth` entsprechend verändert.
 
-Die Änderungen die Sie vornehem sollen sind die folgenden: Jede Wand die im Weg ist muss weg. Also jede Passage die auf dem `path` liegt und geschlossen ist, gehört geöffnet.
+Die Änderungen die Sie vornehem, sollen sind die folgenden: Jede Wand die im Weg ist muss weg. Also jeder Durchgang, der auf dem `path` liegt und geschlossen ist, gehört geöffnet.
 
 Der Start und alle Schatzkammern sind übrigens __IMMER__ in alle Richtungen geöffnet.
 
