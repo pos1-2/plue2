@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by Florian on 12.12.2014.
  */
-public class Generator {
+public class GenerateLabyrinth {
     private static final List<Direction> DIRECTIONS = Arrays.asList(new Left(), new Right(), new Up(), new Down());
     private static final Random RANDOM = new Random();
 
@@ -24,7 +24,7 @@ public class Generator {
     private int maxX = 0, minX = 0, maxY = 0, minY = 0;
     private int targetWidth, targetHeight;
 
-    public Generator(int width, int height, float fill, Treasure... treasures) {
+    public GenerateLabyrinth(int width, int height, float fill, Treasure... treasures) {
         map = new HashMap<Coords, MyTile>();
 
         targetWidth = width;
@@ -325,7 +325,7 @@ public class Generator {
     }
 
     public static void main(String[] args) {
-        Generator g = new Generator(35, 15, 0.8f, t(4, 8), t(3, 1), t(13, 1), t(2, 1), t(1, 1), t(1, 7));
+        GenerateLabyrinth g = new GenerateLabyrinth(35, 15, 0.8f, t(4, 8), t(3, 1), t(13, 1), t(2, 1), t(1, 1), t(1, 7));
         g.get("l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7");
     }
 }
