@@ -1,3 +1,9 @@
+PANDOC.tex
+*.aux
+*.pdf
+*.log
+*.txt
+
 # Created by .gitignore support plugin (hsz.mobi)
 ### Gradle template
 .gradle
