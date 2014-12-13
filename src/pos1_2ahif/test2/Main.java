@@ -17,7 +17,7 @@ public final class Main {
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader s = new Assets.SolutionLoader(Main.class.getClassLoader());
 
-        Exercises referenceSolution = (Exercises) s.loadClass("pos1_2ahif.test2.ReferenceSolution").newInstance();
+        Exercises referenceSolution = (Exercises) s.loadClass("pos1_2ahif.test2.internal.ReferenceSolution").newInstance();
 
         Solution solution = new Solution(referenceSolution);
 
