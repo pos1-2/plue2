@@ -23,7 +23,7 @@ public class Generator {
     private int maxX = 0, minX = 0, maxY = 0, minY = 0;
     private int targetWidth, targetHeight;
 
-    public Generator(int width, int height, float fill, Labyrinth.Treasure... treasures) {
+    public Generator(int width, int height, float fill, Treasure... treasures) {
         map = new HashMap<Coords, MyTile>();
 
         targetWidth = width;
@@ -33,7 +33,7 @@ public class Generator {
 
         putCross(start);
 
-        for (Labyrinth.Treasure t : treasures) {
+        for (Treasure t : treasures) {
             while (true) {
                 Coords tc = randomCoords(1);
                 if (Math.min(
@@ -62,7 +62,7 @@ public class Generator {
                 + pass2int(t.getRight()) + ","
                 + pass2int(t.getUp()) + ","
                 + pass2int(t.getDown())
-                + ((t instanceof Labyrinth.Treasure) ? ("," + ((Labyrinth.Treasure) t).getValue() + "f," + ((Labyrinth.Treasure) t).getWeight() + "f") : "");
+                + ((t instanceof Treasure) ? ("," + ((Treasure) t).getValue() + "f," + ((Treasure) t).getWeight() + "f") : "");
     }
 
     public Labyrinth get(String name) {
@@ -220,7 +220,7 @@ public class Generator {
         }
     }
 
-    private void putCross(Coords coords, final Labyrinth.Treasure treasure) {
+    private void putCross(Coords coords, final Treasure treasure) {
         map.put(coords, new MyTileWithTreasure(true, true, true, true) {
             @Override
             public float getValue() {
@@ -284,13 +284,13 @@ public class Generator {
         }
     }
 
-    private static abstract class MyTileWithTreasure extends MyTile implements Labyrinth.Treasure {
+    private static abstract class MyTileWithTreasure extends MyTile implements Treasure {
         public MyTileWithTreasure(boolean left, boolean right, boolean up, boolean down) {
             super(left, right, up, down);
         }
     }
 
-    public static class SimpleTreasure implements Labyrinth.Treasure {
+    public static class SimpleTreasure implements Treasure {
         private final float value, weight;
 
         public SimpleTreasure(float value, float weight) {
@@ -309,8 +309,8 @@ public class Generator {
         }
     }
 
-    private static Labyrinth.Treasure t(final float value, final float weight) {
-        return new Labyrinth.Treasure() {
+    private static Treasure t(final float value, final float weight) {
+        return new Treasure() {
             @Override
             public float getValue() {
                 return value;

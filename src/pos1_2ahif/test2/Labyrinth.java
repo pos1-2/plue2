@@ -14,12 +14,6 @@ public final class Labyrinth implements Map<Coords, Tile> {
         boolean isOpen();
     }
 
-    public interface Treasure {
-        float getValue();
-
-        float getWeight();
-    }
-
     public interface CollectedTreasure extends Treasure {
     }
 
