@@ -1,7 +1,6 @@
 package pos1_2ahif.test2;
 
-import pos1_2ahif.test2.api.Coords;
-import pos1_2ahif.test2.api.Exercises;
+import pos1_2ahif.test2.api.*;
 
 import java.io.File;
 import java.util.*;
@@ -44,59 +43,6 @@ public final class Labyrinth implements Map<Coords, Labyrinth.Tile> {
             } else {
                 throw new IllegalArgumentException("Unexpected direction to get: " + direction);
             }
-        }
-    }
-
-    public static abstract class Direction {
-        private Direction() {
-        }
-
-        public abstract Direction getOppositeDirection();
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            return getClass().hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName();
-        }
-    }
-
-    public static final class Left extends Direction {
-        @Override
-        public Direction getOppositeDirection() {
-            return new Right();
-        }
-    }
-
-    public static final class Right extends Direction {
-        @Override
-        public Direction getOppositeDirection() {
-            return new Left();
-        }
-    }
-
-    public static final class Up extends Direction {
-        @Override
-        public Direction getOppositeDirection() {
-            return new Down();
-        }
-    }
-
-    public static final class Down extends Direction {
-        @Override
-        public Direction getOppositeDirection() {
-            return new Up();
         }
     }
 

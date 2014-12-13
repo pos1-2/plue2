@@ -19,9 +19,9 @@ public interface Exercises {
 
     public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
 
-    public void clearPassagesAlongPath(Labyrinth labyrinth, List<Labyrinth.Direction> path);
+    public void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
 
-    public List<Labyrinth.Direction> joinPaths(List<List<Labyrinth.Direction>> paths);
+    public List<Direction> joinPaths(List<List<Direction>> paths);
 
-    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Labyrinth.Direction> path, File file);
+    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
 }

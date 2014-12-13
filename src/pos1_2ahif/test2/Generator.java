@@ -1,6 +1,6 @@
 package pos1_2ahif.test2;
 
-import pos1_2ahif.test2.api.Coords;
+import pos1_2ahif.test2.api.*;
 
 import java.util.*;
 
@@ -8,14 +8,14 @@ import java.util.*;
  * Created by Florian on 12.12.2014.
  */
 public class Generator {
-    private static final List<Labyrinth.Direction> DIRECTIONS = Arrays.asList(new Labyrinth.Left(), new Labyrinth.Right(), new Labyrinth.Up(), new Labyrinth.Down());
+    private static final List<Direction> DIRECTIONS = Arrays.asList(new Left(), new Right(), new Up(), new Down());
     private static final Random RANDOM = new Random();
 
     private static final float EXPLORE = 0.5f;
     private static final float BREAK_WALL = 0.1f;
     private static final float SECTION = 0.05f;
 
-    private static Labyrinth.Direction random() {
+    private static Direction random() {
         return DIRECTIONS.get(RANDOM.nextInt(DIRECTIONS.size()));
     }
 
@@ -106,7 +106,7 @@ public class Generator {
                 ).get(RANDOM.nextInt(map.size()));
             }
         }
-        Labyrinth.Direction d;
+        Direction d;
         while (true) {
             d = random();
             if (map.get(start).getDirection(d).isOpen()) {
@@ -122,14 +122,14 @@ public class Generator {
         generateRandomPath(start, d);
     }
 
-    private boolean shallContinue(Coords coords, Labyrinth.Direction direction) {
+    private boolean shallContinue(Coords coords, Direction direction) {
         return canExpand(coords, direction)
                 &&
                 (!map.containsKey(coords.go(direction)) || Math.random() < BREAK_WALL);
     }
 
-    private void generateRandomPath(Coords cur, Labyrinth.Direction d) {
-        List<Labyrinth.Direction> ds = new ArrayList<Labyrinth.Direction>(DIRECTIONS);
+    private void generateRandomPath(Coords cur, Direction d) {
+        List<Direction> ds = new ArrayList<Direction>(DIRECTIONS);
 
         nextStep:
         while (true) {
@@ -144,7 +144,7 @@ public class Generator {
 
             Collections.shuffle(ds);
 
-            for (Labyrinth.Direction dd : ds) {
+            for (Direction dd : ds) {
                 if (!map.get(cur).getDirection(dd).isOpen() && shallContinue(cur, dd)) {
                     d = dd;
                     continue nextStep;
@@ -179,7 +179,7 @@ public class Generator {
         return getHeight() < targetHeight;
     }
 
-    private boolean canExpand(Coords coords, Labyrinth.Direction dir) {
+    private boolean canExpand(Coords coords, Direction dir) {
         Coords next = coords.go(dir);
         return withinX(coords) && withinY(coords)
                 && (withinX(next) || canGrowWidth())
@@ -203,12 +203,12 @@ public class Generator {
             map.put(coords, new MyTile(true, true, true, true));
             expand(coords);
         } else {
-            for (Labyrinth.Direction d : DIRECTIONS) {
+            for (Direction d : DIRECTIONS) {
                 map.get(coords).getUp().setOpen(true);
             }
         }
 
-        for (Labyrinth.Direction d : DIRECTIONS) {
+        for (Direction d : DIRECTIONS) {
             Coords c = coords.go(d);
 
             if (!map.containsKey(c)) {

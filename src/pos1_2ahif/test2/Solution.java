@@ -1,6 +1,7 @@
 package pos1_2ahif.test2;
 
 import pos1_2ahif.test2.api.Coords;
+import pos1_2ahif.test2.api.Direction;
 import pos1_2ahif.test2.api.Exercises;
 
 import java.io.File;
@@ -42,17 +43,17 @@ public class Solution implements Exercises {
     }
 
     @Override
-    public void clearPassagesAlongPath(Labyrinth labyrinth, List<Labyrinth.Direction> path) {
+    public void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path) {
         referenceSolution.clearPassagesAlongPath(labyrinth, path);
     }
 
     @Override
-    public List<Labyrinth.Direction> joinPaths(List<List<Labyrinth.Direction>> paths) {
+    public List<Direction> joinPaths(List<List<Direction>> paths) {
         return referenceSolution.joinPaths(paths);
     }
 
     @Override
-    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Labyrinth.Direction> path, File file) {
+    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file) {
         referenceSolution.printPlanForTreasureHunt(labyrinth, path, file);
     }
 }

@@ -1,7 +1,5 @@
 package pos1_2ahif.test2.api;
 
-import pos1_2ahif.test2.Labyrinth;
-
 /**
 * Created by Florian on 13.12.2014.
 */
@@ -22,14 +20,14 @@ public final class Coords {
         return y;
     }
 
-    public Coords go(Labyrinth.Direction direction) {
-        if (direction instanceof Labyrinth.Left) {
+    public Coords go(Direction direction) {
+        if (direction instanceof Left) {
             return new Coords(x - 1, y);
-        } else if (direction instanceof Labyrinth.Right) {
+        } else if (direction instanceof Right) {
             return new Coords(x + 1, y);
-        } else if (direction instanceof Labyrinth.Up) {
+        } else if (direction instanceof Up) {
             return new Coords(x, y - 1);
-        } else if (direction instanceof Labyrinth.Down) {
+        } else if (direction instanceof Down) {
             return new Coords(x, y + 1);
         } else {
             throw new IllegalArgumentException("Unexpected direction to go: " + direction);
