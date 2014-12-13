@@ -390,7 +390,11 @@ public final class BFSLabyrinth implements Labyrinth {
 
     private static char getEdgePieceForTileAndPath(Tile tile, Coords coords, Direction direction, Set<UnorderedPair> moves) {
         if (moves.contains(new UnorderedPair(coords, coords.go(direction)))) {
-            return '*';
+            if (direction instanceof Left || direction instanceof Right) {
+                return '.';
+            } else {
+                return ':';
+            }
         } else {
             return getEdgePieceForTile(tile, direction);
         }
@@ -408,12 +412,22 @@ public final class BFSLabyrinth implements Labyrinth {
         }
     }
 
-    private static char getMidPieceForTileAndPath(Tile tile, Coords coords, Set<Coords> visited) {
-        if (visited.contains(coords)) {
-            return '*';
-        } else {
-            return getMidPieceForTile(tile, coords);
+    private static String getMidPiecesForTileAndPath(Tile tile, Coords coords, Set<UnorderedPair> moves) {
+        char leftPiece = getMidPieceForTile(tile, coords);
+        char rightPiece = getMidPieceForTile(tile, coords);
+
+        if (moves.contains(new UnorderedPair(coords, coords.go(RIGHT)))) {
+            rightPiece = '.';
         }
+
+        if (moves.contains(new UnorderedPair(coords, coords.go(UP)))) {
+            leftPiece = ':';
+        } else if (moves.contains(new UnorderedPair(coords, coords.go(LEFT))) ||
+                moves.contains(new UnorderedPair(coords, coords.go(DOWN)))) {
+            leftPiece = '.';
+        }
+
+        return "" + leftPiece + rightPiece;
     }
 
     @Override
@@ -422,16 +436,19 @@ public final class BFSLabyrinth implements Labyrinth {
             return "";
         }
 
-        Set<Coords> visited = new HashSet<Coords>();
+        if (path == null) {
+            path = Collections.emptyList();
+        }
+
+        String newLine = System.getProperty("line.separator");
+
         Set<UnorderedPair> moves = new HashSet<UnorderedPair>();
 
         if (path != null) {
             Coords current = new Coords(0, 0);
-            visited.add(current);
 
             for (Direction direction : path) {
                 Coords next = current.go(direction);
-                visited.add(next);
                 moves.add(new UnorderedPair(current, next));
                 current = next;
             }
@@ -454,11 +471,14 @@ public final class BFSLabyrinth implements Labyrinth {
             s3.setLength(0);
 
             for (int x = xMin; x <= xMax; x++) {
-                // every field is 3x3 characters
-                // each field is responsible for drowing rows and cols 2 & 3
+                // every field is 4x3 characters, e.g.
+                // +--+
+                // |  |
+                // +--+
+                // each field is responsible for drowing rows 2 & 3 and cols 2-4
                 // the first row and first col in addition will draw its 1st row and col
                 // if a tile is null, it will be rendered as XXX...
-                // but then the 3rd column and row must be rendered by the next tile to the right and down
+                // but then the 4th column and 3rd row must be rendered by the next tile to the right and down
                 // because there might be some walls to display
                 // this is also necessary when there is a neighboring special tile because they are
                 // displayed specially as well
@@ -530,9 +550,11 @@ public final class BFSLabyrinth implements Labyrinth {
                 if (y == yMin) {
                     // print top middle
                     s.append(getEdgePieceForTileAndPath(tile, coords, UP, moves));
+                    s.append(getEdgePieceForTileAndPath(tile, coords, UP, Collections.<UnorderedPair>emptySet()));
                 }
-                s2.append(getMidPieceForTileAndPath(tile, coords, visited));
+                s2.append(getMidPiecesForTileAndPath(tile, coords, moves));
                 s3.append(getEdgePieceForTileAndPath(downTile, downCoords, downDirection, moves));
+                s3.append(getEdgePieceForTileAndPath(downTile, downCoords, downDirection, Collections.<UnorderedPair>emptySet()));
 
                 // print right column
                 if (y == yMin) {
@@ -544,12 +566,12 @@ public final class BFSLabyrinth implements Labyrinth {
             }
 
             if (y == yMin) {
-                s.append('\n');
+                s.append(newLine);
             }
             s.append(s2);
-            s.append('\n');
+            s.append(newLine);
             s.append(s3);
-            s.append('\n');
+            s.append(newLine);
         }
 
         return s.toString();
