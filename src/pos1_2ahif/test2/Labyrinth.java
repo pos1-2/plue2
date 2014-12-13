@@ -1,5 +1,7 @@
 package pos1_2ahif.test2;
 
+import pos1_2ahif.test2.api.Exercises;
+
 import java.io.File;
 import java.util.*;
 
@@ -7,23 +9,6 @@ import java.util.*;
  * Created by Florian on 08.12.2014.
  */
 public final class Labyrinth implements Map<Labyrinth.Coords, Labyrinth.Tile> {
-    public interface Exercises {
-        public String getMyName();
-
-        public String getMyExamAccountName();
-
-        public boolean hasAnyTreasure(Labyrinth labyrinth);
-
-        public List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
-
-        public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
-
-        public void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
-
-        public List<Direction> joinPaths(List<List<Direction>> paths);
-
-        public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
-    }
 
     public static final class Coords {
         private int x;

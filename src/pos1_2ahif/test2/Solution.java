@@ -1,15 +1,17 @@
 package pos1_2ahif.test2;
 
+import pos1_2ahif.test2.api.Exercises;
+
 import java.io.File;
 import java.util.List;
 
 /**
  * Created by Florian on 12.12.2014.
  */
-public class Solution implements Labyrinth.Exercises {
-    private final Labyrinth.Exercises referenceSolution;
+public class Solution implements Exercises {
+    private final Exercises referenceSolution;
 
-    public Solution(Labyrinth.Exercises referenceSolution) {
+    public Solution(Exercises referenceSolution) {
         this.referenceSolution = referenceSolution;
     }
 
