@@ -1,7 +1,5 @@
 package pos1_2ahif.test2.api;
 
-import pos1_2ahif.test2.Labyrinth;
-
 import java.io.File;
 import java.util.List;
 

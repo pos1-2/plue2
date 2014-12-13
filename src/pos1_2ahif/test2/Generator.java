@@ -1,6 +1,7 @@
 package pos1_2ahif.test2;
 
 import pos1_2ahif.test2.api.*;
+import pos1_2ahif.test2.impl.BFSLabyrinth;
 
 import java.util.*;
 
@@ -53,7 +54,7 @@ public class Generator {
     }
 
 
-    private static int pass2int(Labyrinth.Passage x) {
+    private static int pass2int(BFSLabyrinth.Passage x) {
         return x.isOpen() ? 1 : 0;
     }
 
@@ -66,7 +67,7 @@ public class Generator {
     }
 
     public Labyrinth get(String name) {
-        Labyrinth l = new Labyrinth(map);
+        Labyrinth l = new BFSLabyrinth(map);
 
         System.out.println("labs.put(\"" + name + "\", new Labyrinth(new HashMap<Coords, Tile>() {{");
         for (Map.Entry<Coords, MyTile> e : map.entrySet()) {
@@ -236,7 +237,7 @@ public class Generator {
         putCross(coords);
     }
 
-    private static class MyPassage implements Labyrinth.Passage {
+    private static class MyPassage implements BFSLabyrinth.Passage {
         boolean open;
 
         public MyPassage(boolean open) {

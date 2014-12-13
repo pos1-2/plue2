@@ -1,4 +1,4 @@
-package pos1_2ahif.test2;
+package pos1_2ahif.test2.impl;
 
 import pos1_2ahif.test2.api.*;
 
@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by Florian on 08.12.2014.
  */
-public final class Labyrinth implements Map<Coords, Tile> {
+public final class BFSLabyrinth implements Labyrinth {
 
     public interface Passage {
         boolean isOpen();
@@ -16,6 +16,7 @@ public final class Labyrinth implements Map<Coords, Tile> {
 
     // see here, how your interface is used:
 
+    @Override
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
         if (!e.hasAnyTreasure(this)) {
             e.printPlanForTreasureHunt(this, Collections.<Direction>emptyList(), report);
@@ -259,6 +260,7 @@ public final class Labyrinth implements Map<Coords, Tile> {
         return path;
     }
 
+    @Override
     public void clearPassages(Map<Coords, Tile> modifiedTiles) {
         for (Coords c : modifiedTiles.keySet()) {
             checkValidUpdate(c, modifiedTiles);
@@ -419,6 +421,7 @@ public final class Labyrinth implements Map<Coords, Tile> {
         }
     }
 
+    @Override
     public String toString(List<Direction> path) {
         if (isEmpty()) {
             return "";
@@ -562,7 +565,7 @@ public final class Labyrinth implements Map<Coords, Tile> {
         return toString(null);
     }
 
-    public Labyrinth(Map<Coords, ? extends Tile> labyrinth) {
+    public BFSLabyrinth(Map<Coords, ? extends Tile> labyrinth) {
         for (Map.Entry<Coords, ? extends Tile> e : labyrinth.entrySet()) {
             final Tile tile = e.getValue();
             if (e.getValue() instanceof Treasure) {

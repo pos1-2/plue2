@@ -1,6 +1,7 @@
 package pos1_2ahif.test2;
 
 import pos1_2ahif.test2.api.Exercises;
+import pos1_2ahif.test2.api.Labyrinth;
 
 import java.io.File;
 import java.util.Map;
@@ -13,7 +14,7 @@ public final class Main {
     }
 
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        ClassLoader s = new Assets.SolutionLoader(Labyrinth.class.getClassLoader());
+        ClassLoader s = new Assets.SolutionLoader(Main.class.getClassLoader());
 
         Exercises referenceSolution = (Exercises) s.loadClass("pos1_2ahif.test2.ReferenceSolution").newInstance();
 
