@@ -8,42 +8,10 @@ import java.util.*;
 /**
  * Created by Florian on 08.12.2014.
  */
-public final class Labyrinth implements Map<Coords, Labyrinth.Tile> {
+public final class Labyrinth implements Map<Coords, Tile> {
 
     public interface Passage {
         boolean isOpen();
-    }
-
-    public static abstract class Tile {
-        public Passage getLeft() {
-            return getDirection(new Left());
-        }
-
-        public Passage getRight() {
-            return getDirection(new Right());
-        }
-
-        public Passage getUp() {
-            return getDirection(new Up());
-        }
-
-        public Passage getDown() {
-            return getDirection(new Down());
-        }
-
-        public Passage getDirection(Direction direction) {
-            if (direction instanceof Left) {
-                return getLeft();
-            } else if (direction instanceof Right) {
-                return getRight();
-            } else if (direction instanceof Up) {
-                return getUp();
-            } else if (direction instanceof Down) {
-                return getDown();
-            } else {
-                throw new IllegalArgumentException("Unexpected direction to get: " + direction);
-            }
-        }
     }
 
     public interface Treasure {

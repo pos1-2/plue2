@@ -253,7 +253,7 @@ public class Generator {
         }
     }
 
-    private static class MyTile extends Labyrinth.Tile {
+    private static class MyTile extends Tile {
         MyPassage left, right, up, down;
 
         public MyTile(boolean left, boolean right, boolean up, boolean down) {
