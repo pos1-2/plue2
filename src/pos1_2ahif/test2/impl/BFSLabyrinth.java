@@ -14,6 +14,7 @@ public final class BFSLabyrinth implements Labyrinth {
     @Override
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
         if (!e.hasAnyTreasure(this)) {
+            printSavingMessage(report);
             e.printPlanForTreasureHunt(this, Collections.<Direction>emptyList(), report);
             return Collections.emptyList();
         }
@@ -45,12 +46,16 @@ public final class BFSLabyrinth implements Labyrinth {
 
         e.clearPassagesAlongPath(this, path);
 
+        printSavingMessage(report);
         e.printPlanForTreasureHunt(this, path, report);
 
         return path;
     }
 
     // -- no need to read further, not relevant for exercise!
+    private void printSavingMessage(File file) {
+        System.out.println("Saving " + file.getAbsolutePath() + "...");
+    }
 
     private float collectAsMuchTreasureAsPossible(List<Coords> treasurePositions, float carryCapacity, List<List<Direction>> pathsTaken) {
         float weight = 0f;
