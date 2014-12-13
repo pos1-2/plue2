@@ -7,19 +7,25 @@ import java.util.List;
 * Created by Florian on 13.12.2014.
 */
 public interface Exercises {
-    public String getMyName();
+    // 0
+    String getMyName();
+    String getMyExamAccountName();
 
-    public String getMyExamAccountName();
+    // 1
+    boolean hasAnyTreasure(Labyrinth labyrinth);
 
-    public boolean hasAnyTreasure(Labyrinth labyrinth);
+    // 2
+    List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
 
-    public List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
+    // 3
+    List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
 
-    public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
+    // 4
+    List<Direction> joinPaths(List<List<Direction>> paths);
 
-    public void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
+    // 5
+    void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
 
-    public List<Direction> joinPaths(List<List<Direction>> paths);
-
-    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
+    // 6
+    void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
 }
