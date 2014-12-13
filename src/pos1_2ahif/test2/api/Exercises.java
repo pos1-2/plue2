@@ -15,9 +15,9 @@ public interface Exercises {
 
     public boolean hasAnyTreasure(Labyrinth labyrinth);
 
-    public List<Labyrinth.Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
+    public List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth);
 
-    public List<Labyrinth.Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
+    public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth);
 
     public void clearPassagesAlongPath(Labyrinth labyrinth, List<Labyrinth.Direction> path);
 

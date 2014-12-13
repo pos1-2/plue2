@@ -1,5 +1,7 @@
 package pos1_2ahif.test2;
 
+import pos1_2ahif.test2.api.Coords;
+
 import java.util.*;
 
 /**
@@ -17,23 +19,23 @@ public class Generator {
         return DIRECTIONS.get(RANDOM.nextInt(DIRECTIONS.size()));
     }
 
-    private Map<Labyrinth.Coords, MyTile> map;
+    private Map<Coords, MyTile> map;
     private int maxX = 0, minX = 0, maxY = 0, minY = 0;
     private int targetWidth, targetHeight;
 
     public Generator(int width, int height, float fill, Labyrinth.Treasure... treasures) {
-        map = new HashMap<Labyrinth.Coords, MyTile>();
+        map = new HashMap<Coords, MyTile>();
 
         targetWidth = width;
         targetHeight = height;
 
-        Labyrinth.Coords start = new Labyrinth.Coords(0, 0);
+        Coords start = new Coords(0, 0);
 
         putCross(start);
 
         for (Labyrinth.Treasure t : treasures) {
             while (true) {
-                Labyrinth.Coords tc = randomCoords(1);
+                Coords tc = randomCoords(1);
                 if (Math.min(
                         Math.abs(start.getX() - tc.getX()),
                         Math.abs(start.getY() - tc.getY())) <= 1) { // to near at start
@@ -67,7 +69,7 @@ public class Generator {
         Labyrinth l = new Labyrinth(map);
 
         System.out.println("labs.put(\"" + name + "\", new Labyrinth(new HashMap<Coords, Tile>() {{");
-        for (Map.Entry<Labyrinth.Coords, MyTile> e : map.entrySet()) {
+        for (Map.Entry<Coords, MyTile> e : map.entrySet()) {
             System.out.println("put(c(" + e.getKey().getX() + "," + e.getKey().getY() + "), t(" + tile2string(e.getValue()) + "));");
         }
         System.out.println("}}));");
@@ -76,30 +78,30 @@ public class Generator {
         return l;
     }
 
-    private Labyrinth.Coords randomCoords() {
+    private Coords randomCoords() {
         return randomCoords(0);
     }
 
-    private Labyrinth.Coords randomCoords(int margin) {
+    private Coords randomCoords(int margin) {
         int x = (targetWidth - getWidth());
         int y = (targetHeight - getHeight());
-        return new Labyrinth.Coords(
+        return new Coords(
                 RANDOM.nextInt(getWidth() + 2 * x - 2 * margin) + minX - x + margin,
                 RANDOM.nextInt(getHeight() + 2 * y - 2 * margin) + minY - y + margin);
     }
 
     private void generateRandomPath() {
-        Labyrinth.Coords start = null;
+        Coords start = null;
         while (start == null) {
             if (Math.random() < SECTION) {
-                Labyrinth.Coords candidate = randomCoords();
+                Coords candidate = randomCoords();
                 if (!map.containsKey(candidate)) {
                     start = candidate;
                     map.put(start, new MyTile(false, false, false, false));
                     expand(start);
                 }
             } else {
-                start = new ArrayList<Labyrinth.Coords>(
+                start = new ArrayList<Coords>(
                         map.keySet()
                 ).get(RANDOM.nextInt(map.size()));
             }
@@ -120,13 +122,13 @@ public class Generator {
         generateRandomPath(start, d);
     }
 
-    private boolean shallContinue(Labyrinth.Coords coords, Labyrinth.Direction direction) {
+    private boolean shallContinue(Coords coords, Labyrinth.Direction direction) {
         return canExpand(coords, direction)
                 &&
                 (!map.containsKey(coords.go(direction)) || Math.random() < BREAK_WALL);
     }
 
-    private void generateRandomPath(Labyrinth.Coords cur, Labyrinth.Direction d) {
+    private void generateRandomPath(Coords cur, Labyrinth.Direction d) {
         List<Labyrinth.Direction> ds = new ArrayList<Labyrinth.Direction>(DIRECTIONS);
 
         nextStep:
@@ -152,19 +154,19 @@ public class Generator {
         }
     }
 
-    private void expand(Labyrinth.Coords coords) {
+    private void expand(Coords coords) {
         maxX = Math.max(maxX, coords.getX());
         minX = Math.min(minX, coords.getX());
         maxY = Math.max(maxY, coords.getY());
         minY = Math.min(minY, coords.getY());
     }
 
-    private boolean withinX(Labyrinth.Coords coords) {
+    private boolean withinX(Coords coords) {
         return coords.getX() <= maxX
                 && minX <= coords.getX();
     }
 
-    private boolean withinY(Labyrinth.Coords coords) {
+    private boolean withinY(Coords coords) {
         return coords.getY() <= maxY
                 && minY <= coords.getY();
     }
@@ -177,8 +179,8 @@ public class Generator {
         return getHeight() < targetHeight;
     }
 
-    private boolean canExpand(Labyrinth.Coords coords, Labyrinth.Direction dir) {
-        Labyrinth.Coords next = coords.go(dir);
+    private boolean canExpand(Coords coords, Labyrinth.Direction dir) {
+        Coords next = coords.go(dir);
         return withinX(coords) && withinY(coords)
                 && (withinX(next) || canGrowWidth())
                 && (withinY(next) || canGrowHeight());
@@ -196,7 +198,7 @@ public class Generator {
         return (float) map.size() / (float) (targetWidth * targetHeight);
     }
 
-    private void putCross(Labyrinth.Coords coords) {
+    private void putCross(Coords coords) {
         if (!map.containsKey(coords)) {
             map.put(coords, new MyTile(true, true, true, true));
             expand(coords);
@@ -207,7 +209,7 @@ public class Generator {
         }
 
         for (Labyrinth.Direction d : DIRECTIONS) {
-            Labyrinth.Coords c = coords.go(d);
+            Coords c = coords.go(d);
 
             if (!map.containsKey(c)) {
                 map.put(c, new MyTile(false, false, false, false));
@@ -218,7 +220,7 @@ public class Generator {
         }
     }
 
-    private void putCross(Labyrinth.Coords coords, final Labyrinth.Treasure treasure) {
+    private void putCross(Coords coords, final Labyrinth.Treasure treasure) {
         map.put(coords, new MyTileWithTreasure(true, true, true, true) {
             @Override
             public float getValue() {

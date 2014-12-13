@@ -1,5 +1,6 @@
 package pos1_2ahif.test2;
 
+import pos1_2ahif.test2.api.Coords;
 import pos1_2ahif.test2.api.Exercises;
 
 import java.io.File;
@@ -31,12 +32,12 @@ public class Solution implements Exercises {
     }
 
     @Override
-    public List<Labyrinth.Coords> getTreasuresOrderedByValue(Labyrinth labyrinth) {
+    public List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth) {
         return referenceSolution.getTreasuresOrderedByValue(labyrinth);
     }
 
     @Override
-    public List<Labyrinth.Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth) {
+    public List<Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth) {
         return referenceSolution.getTreasuresOrderedByValuePerWeight(labyrinth);
     }
 
