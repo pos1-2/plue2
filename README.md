@@ -3,7 +3,7 @@
 
 ## Aufgabenstellung
 
-__Das folgende ist bereits implementiert! Sie müssen hier noch nichts Programmieren! In Ihrem eigenen Code, müssen Sie aber mit den hier beschrieben Schnittstellen arbeiten!__
+__Das folgende ist bereits implementiert! Sie müssen hier noch nichts Programmieren! In Ihrem eigenen Code, müssen Sie aber mit den hier beschriebenen Schnittstellen arbeiten!__
 
 Sie werden eine Schatzsuchertruppe mit einem Computer Programm unterstützen. Die Schatzsuche findet in Labyrinthen statt: Ihr Trupp muss einen Weg durch ein Labyrinth finden und natürlich so viele Schätze sammeln wie möglich. So schaut ein Labyrinth aus:
 ```
@@ -51,7 +51,7 @@ public abstract class Tile {
     public boolean isDirectionOpen(Direction direction) { ... }
 }
 ```
-Ein Abschnitt wird beschrieben durch 4 Durchgänge (ein Durchgang führt zu einem benachbarten Abschnitt), jeweils in die Richtungen Links, Rechts, Oben, Unten. Das z.B. ist ein Abschnitt mit 2 offnen Durchgängen - Links und Unten - und 2 geschlossenen Durchgängen - Oben und Rechts:
+Ein Abschnitt wird beschrieben durch 4 Durchgänge (ein Durchgang führt zu einem benachbarten Abschnitt), jeweils in die Richtungen Links, Rechts, Oben, Unten. Das z.B. ist ein Abschnitt mit 2 offenen Durchgängen - Links und Unten - und 2 geschlossenen Durchgängen - Oben und Rechts:
 ```
 +-+
   |
@@ -129,15 +129,13 @@ Die Methode soll `true` liefern wenn es in dem gegeben `labyrinth` überhaupt ei
 
 Implementieren Sie
 ```
-List<Coords> getTreasuresOrderedByValue(Labyrinth labyrinth)
+List<Treasure> getTreasuresOrderedByValue(Labyrinth labyrinth)
 ```
-Diese Methode soll eine Liste aller Koordinaten zurückgeben, an denen sich Schätze befinden. Die Liste soll dabei __absteigend nach dem Wert__ des Schatzes geordnet sein.
+Diese Methode soll eine Liste aller `Treasure`s (Schätze) zurückgeben, die sich in dem `Labyrinth` finden lassen. Die Liste soll dabei __absteigend nach dem Wert__ des Schatzes geordnet sein.
 
-Programmieren Sie einen geeigneten `Comperator` und verwenden Sie die `Collections.sort` Methode zum Sortieren.
+Programmieren Sie einen geeigneten `Comparator` und verwenden Sie die `Collections.sort` Methode zum Sortieren.
 
-__Tipp__ Möglicherweise möchten Sie sich zuerst an einer `private` Methode `private List<Coords> getTreasures()` versuchen, bei der die Ordnung noch nicht relevant ist.
-
-__Tipp__ Beachten Sie: Sie sollen `Coords`s (Koordinaten) zurückliefern und keine `Treasure`s (die Schätze an sich)!
+__Tipp__ Möglicherweise möchten Sie sich zuerst an einer `private` Methode `private List<Treasure> getTreasures()` versuchen, bei der die Ordnung noch nicht relevant ist.
 
 __Tipp__ Für `float` bzw. `Float` gibt es bereits ein `compare`, das Sie möglicherweise wiederverwenden wollen:
 
@@ -153,12 +151,12 @@ return Float.compare(f1, f2); // Vergleich für eine __aufsteigende__ Ordnung
 Geld ist nicht alles! Ihr Trupp kann nur ein begrenztes Gewicht an Ladung transportieren, und kann daher nicht immer alle Schätze bergen. Implementieren Sie
 
 ```
-List<Labyrinth.Coords> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth)
+List<Treasure> getTreasuresOrderedByValuePerWeight(Labyrinth labyrinth)
 ```
 
 Diese Methode funktioniert genauso wie `getTreasuresOrderedByValue`, sortiert aber __absteigend nach Wert per Gewicht__. Wert per Gewicht berechnet sich so: `valuePerWeight = value / weight`
 
-Verwenden Sie erneut `Collections.sort` - Sie brauchen hier einen 2. `Comperator`.
+Verwenden Sie erneut `Collections.sort` - Sie brauchen hier einen 2. `Comparator`.
 
 (Anm.: Ihr Trupp wird eine alternative Route planen und selbstständig entscheiden, ob er die Route aus Punkt 2 verfolgt (die wertvollen Schätze), oder lieber doch diese alternative Route (die leichtgewichtigeren Schätze))
 
@@ -215,13 +213,13 @@ die Sie dafür verwenden sollen.
 
 Diese Methode funktioniert wie `Map.putAll`, überprüft aber, ob Sie das `Labyrinth` in einem konsistenten Zustand hinterlassen:
 
-Jeder Durchgang verbindet genau 2 `Tile`s. Wenn Sie eine Durchgang sprengen, müssen Sie das daher sicherstellen, dass der Durchgang von beiden Seiten (beiden `Tile`s) geöffnet ist! Z.b.
+Jeder Durchgang verbindet genau 2 `Tile`s. Wenn Sie eine Durchgang sprengen, müssen Sie das daher sicherstellen, dass der Durchgang nachher von beiden Seiten (beiden `Tile`s) geöffnet ist! Z.b.
 ```
 +--+--+
 |t1|t2|
 +--+--+
 ```
-wenn Sie die mittlere Wand sprengen wollen, muss folgendes gelten:
+wenn Sie die mittlere Wand sprengen, muss nach der Sprengung folgendes gelten:
 ```
 t1.isRightOpen() == true && t2.isLeftOpen() == true
 ```
