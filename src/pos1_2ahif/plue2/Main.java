@@ -1,8 +1,7 @@
 package pos1_2ahif.plue2;
 
-import pos1_2ahif.plue2.impl.Assets;
-import pos1_2ahif.plue2.api.Exercises;
 import pos1_2ahif.plue2.api.Labyrinth;
+import pos1_2ahif.plue2.impl.Assets;
 
 import java.io.File;
 import java.util.Map;
@@ -15,19 +14,28 @@ public final class Main {
     }
 
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        ClassLoader s = new Assets.SolutionLoader(Main.class.getClassLoader());
+        // hier wird Ihre Solution erstellt:
+        Solution solution = new Solution(Assets.getReferenceSolution());
 
-        Exercises referenceSolution = (Exercises) s.loadClass("pos1_2ahif.plue2.internal.ReferenceSolution").newInstance();
+        float maxCarryCapacity = 5; // so viel kann Ihr Trupp max transportieren
 
-        Solution solution = new Solution(referenceSolution);
+        Map<String, Labyrinth> labyrinths = Assets.labyrinths();
 
-        for (Map.Entry<String, Labyrinth> e : Assets.labyrinths().entrySet()) {
-            System.out.println("Exploring " + e.getKey() + "...");
+        // 1. Labyrinth
+        Labyrinth l1 = labyrinths.get("l5x5-no-treasure");
+        System.out.println("Exploring l5x5-no-treasure...");
+        l1.explore(solution, maxCarryCapacity, new File("l5x5-no-treasure.txt"));
 
-            Labyrinth l = e.getValue();
+        // 2. Labyrinth
+        Labyrinth l2 = labyrinths.get("l10x10-treasure-4-8-and-3-1");
+        System.out.println("Exploring l10x10-treasure-4-8-and-3-1...");
+        l2.explore(solution, maxCarryCapacity, new File("l10x10-treasure-4-8-and-3-1.txt"));
 
-            l.explore(solution, 5f, new File(e.getKey() + ".txt"));
-        }
+        // 3. Labyrinth
+        Labyrinth l3 = labyrinths.get("l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7");
+        System.out.println("Exploring l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7...");
+        l3.explore(solution, maxCarryCapacity, new File("l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7.txt"));
+
         System.out.println("Done!");
     }
 }
