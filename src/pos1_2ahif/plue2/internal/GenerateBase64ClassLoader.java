@@ -1,4 +1,4 @@
-package pos1_2ahif.test2.internal;
+package pos1_2ahif.plue2.internal;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
@@ -10,9 +10,9 @@ import java.nio.file.Files;
  */
 public class GenerateBase64ClassLoader {
     public GenerateBase64ClassLoader() throws IOException {
-        for (File f : new File("build/cl/main/pos1_2ahif/test2/internal").listFiles()) {
+        for (File f : new File("build/cl/main/pos1_2ahif/plue2/internal").listFiles()) {
             if (f.getName().startsWith("ReferenceSolution")) {
-                String className = "pos1_2ahif.test2.internal." + f.getName().replace(".class", "");
+                String className = "pos1_2ahif.plue2.internal." + f.getName().replace(".class", "");
                 byte[] data = Files.readAllBytes(f.toPath());
 
                 System.out.println("this.defineClass(\"" + className + "\", DatatypeConverter.parseBase64Binary(\"" + DatatypeConverter.printBase64Binary(data) + "\"), 0, " + data.length + ", (CodeSource) null);");

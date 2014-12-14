@@ -1,6 +1,4 @@
-package pos1_2ahif.test2.api;
-
-import pos1_2ahif.test2.api.Treasure;
+package pos1_2ahif.plue2.api;
 
 /**
 * Created by Florian on 13.12.2014.

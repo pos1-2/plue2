@@ -1,9 +1,9 @@
-package pos1_2ahif.test2;
+package pos1_2ahif.plue2;
 
-import pos1_2ahif.test2.api.Coords;
-import pos1_2ahif.test2.api.Direction;
-import pos1_2ahif.test2.api.Exercises;
-import pos1_2ahif.test2.api.Labyrinth;
+import pos1_2ahif.plue2.api.Coords;
+import pos1_2ahif.plue2.api.Direction;
+import pos1_2ahif.plue2.api.Exercises;
+import pos1_2ahif.plue2.api.Labyrinth;
 
 import java.io.File;
 import java.util.List;

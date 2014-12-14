@@ -1,7 +1,7 @@
-package pos1_2ahif.test2.internal;
+package pos1_2ahif.plue2.internal;
 
-import pos1_2ahif.test2.api.*;
-import pos1_2ahif.test2.impl.BFSLabyrinth;
+import pos1_2ahif.plue2.api.*;
+import pos1_2ahif.plue2.impl.BFSLabyrinth;
 
 import java.util.*;
 

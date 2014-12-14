@@ -111,7 +111,7 @@ Kopieren Sie die gegebenen Dateien in Ihr eclipse Projekt. __Ziehen Sie einfach 
 
 Wenn Sie das richtig gemacht haben sollten, __MUSS__ das Programm __ohne weitere Veränderungen__ schon lauffähig sein!
 
-__a) Führen Sie das Programm testweise aus (`pos1_2ahif.test2.Main`)! Wenn das nicht funktioniert, melden Sie sich bitte UMGEHEND!__
+__a) Führen Sie das Programm testweise aus (`pos1_2ahif.plue2.Main`)! Wenn das nicht funktioniert, melden Sie sich bitte UMGEHEND!__
 
 __b) Implementieren Sie die Methoden `getMyName` und `getMyExamAccountName`__
 

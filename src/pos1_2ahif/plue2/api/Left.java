@@ -1,11 +1,11 @@
-package pos1_2ahif.test2.api;
+package pos1_2ahif.plue2.api;
 
 /**
 * Created by Florian on 13.12.2014.
 */
-public final class Up extends Direction {
+public final class Left extends Direction {
     @Override
     public Direction getOppositeDirection() {
-        return new Down();
+        return new Right();
     }
 }
