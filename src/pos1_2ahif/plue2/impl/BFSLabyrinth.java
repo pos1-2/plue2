@@ -19,30 +19,35 @@ public final class BFSLabyrinth implements Labyrinth {
             return Collections.emptyList();
         }
 
-        List<List<Direction>> pathsForValue = new LinkedList<List<Direction>>();
-        List<List<Direction>> pathsForValuePerWeight = new LinkedList<List<Direction>>();
+        List<Treasure> treasuresOrderedByValue = e.getTreasuresOrderedByValue(this);
+        List<Treasure> treasuresOrderedByValuePerWeight = e.getTreasuresOrderedByValuePerWeight(this);
+
+        List<Coords> pathCoordsForValue = new LinkedList<Coords>();
+        List<Coords> pathCoordsForValuePerWeight = new LinkedList<Coords>();
 
         float treasuresCollectedWhenPrioritizingValue =
                 collectAsMuchTreasureAsPossible(
-                        e.getTreasuresOrderedByValue(this),
+                        treasuresOrderedByValue,
                         carryCapacity,
-                        pathsForValue);
+                        pathCoordsForValue);
 
         float treasuresCollectedWhenPrioritizingValuePerWeight =
                 collectAsMuchTreasureAsPossible(
-                        e.getTreasuresOrderedByValuePerWeight(this),
+                        treasuresOrderedByValuePerWeight,
                         carryCapacity,
-                        pathsForValuePerWeight);
+                        pathCoordsForValuePerWeight);
 
-        List<List<Direction>> betterRoute;
+        List<Coords> betterPathCoords;
 
         if (treasuresCollectedWhenPrioritizingValue > treasuresCollectedWhenPrioritizingValuePerWeight) {
-            betterRoute = pathsForValue;
+            betterPathCoords = pathCoordsForValue;
         } else {
-            betterRoute = pathsForValuePerWeight;
+            betterPathCoords = pathCoordsForValuePerWeight;
         }
 
-        List<Direction> path = e.joinPaths(betterRoute);
+        List<List<Direction>> betterPlan = planRoutes(betterPathCoords);
+
+        List<Direction> path = e.joinPaths(betterPlan);
 
         e.clearPassagesAlongPath(this, path);
 
@@ -52,16 +57,61 @@ public final class BFSLabyrinth implements Labyrinth {
         return path;
     }
 
+    private List<List<Direction>> planRoutes(List<Coords> betterCoords) {
+        List<List<Direction>> plan = new LinkedList<List<Direction>>();
+        Coords prev = null;
+        for (Coords next : betterCoords) {
+            if (prev != null) {
+                List<Direction> subPath = findPath(prev, next);
+                if (subPath == null) {
+                    throw new IllegalStateException("Error in planing: Coords not reachable! Ask for Prof. Hassanen to help you!");
+                }
+                plan.add(subPath);
+            }
+            if (!next.equals(new Coords(0, 0))) {
+                collectTreasure(next);
+            }
+            prev = next;
+        }
+        return plan;
+    }
+
+    private void collectTreasure(Coords treasureCoords) {
+        final Tile tile = get(treasureCoords);
+        if (!(tile instanceof Treasure)) {
+            throw new IllegalStateException("Cannot collect Treasure: It is not there anymore! Ask for Prof. Hassanen to help you!");
+        }
+
+        final Treasure treasure = (Treasure) tile;
+        map.put(treasureCoords, new TileWithCollectedTreasure() {
+            @Override
+            public boolean isDirectionOpen(Direction direction) {
+                return tile.isDirectionOpen(direction);
+            }
+
+            @Override
+            public float getValue() {
+                return treasure.getValue();
+            }
+
+            @Override
+            public float getWeight() {
+                return treasure.getWeight();
+            }
+        });
+    }
+
     // -- no need to read further, not relevant for exercise!
     private void printSavingMessage(File file) {
         System.out.println("Saving " + file.getAbsolutePath() + "...");
     }
 
-    private float collectAsMuchTreasureAsPossible(List<Coords> treasurePositions, float carryCapacity, List<List<Direction>> pathsTaken) {
+    private float collectAsMuchTreasureAsPossible(List<Treasure> treasures, float carryCapacity, List<Coords> pathCoords) {
         float weight = 0f;
         float value = 0f;
 
         Coords current = new Coords(0, 0);
+        pathCoords.add(current);
 
         if (!containsKey(current)) {
             throw new IllegalStateException("Error in labyrinth! No valid start! Ask for Prof. Hassanen to help you!");
@@ -69,7 +119,16 @@ public final class BFSLabyrinth implements Labyrinth {
 
         Set<Coords> alreadyCollected = new HashSet<Coords>();
 
-        for (Coords treasurePosition : treasurePositions) {
+        for (final Treasure treasure : treasures) {
+            Coords treasurePosition = getCoordsForTreasure(treasure);
+            if (treasurePosition == null) {
+                throw new IllegalArgumentException("Given Treasure (value = " + treasure.getValue() + ", weight = " + treasure.getWeight() + " does not exist in labyrinth!");
+            }
+
+            if (weight + treasure.getWeight() > carryCapacity) {
+                continue; // too heavy, skip it
+            }
+
             List<Direction> path = findPath(current, treasurePosition);
             if (path == null) { // not reachable
                 continue;
@@ -84,30 +143,8 @@ public final class BFSLabyrinth implements Labyrinth {
                 throw new IllegalStateException("Tile at coord " + treasurePosition + " is not a treasure!");
             }
 
-            final Treasure treasure = (Treasure) tile;
-
-            if (weight + treasure.getWeight() > carryCapacity) {
-                continue; // too heavy, skip it
-            }
-
             alreadyCollected.add(treasurePosition);
-            map.put(treasurePosition, new TileWithCollectedTreasure() {
-                @Override
-                public boolean isDirectionOpen(Direction direction) {
-                    return tile.isDirectionOpen(direction);
-                }
-
-                @Override
-                public float getValue() {
-                    return treasure.getValue();
-                }
-
-                @Override
-                public float getWeight() {
-                    return treasure.getWeight();
-                }
-            });
-            pathsTaken.add(path);
+            pathCoords.add(treasurePosition);
             weight += treasure.getWeight();
             value += treasure.getValue();
             current = treasurePosition;
@@ -118,8 +155,7 @@ public final class BFSLabyrinth implements Labyrinth {
         if (pathOut == null) {
             throw new IllegalStateException("Error in labyrinth! Expedition is trapped! Ask for Prof. Hassanen to help you!");
         }
-
-        pathsTaken.add(pathOut);
+        pathCoords.add(new Coords(0, 0));
 
         return value;
     }
@@ -301,6 +337,16 @@ public final class BFSLabyrinth implements Labyrinth {
 
     private Map<Coords, Tile> map = new HashMap<Coords, Tile>();
     private Map<Coords, Tile> unmodifiableMap = Collections.unmodifiableMap(map);
+    private Map<Treasure, Coords> treasureMap = new HashMap<Treasure, Coords>();
+
+    public Coords getCoordsForTreasure(Treasure t) {
+        for (Map.Entry<Treasure, Coords> e : treasureMap.entrySet()) {
+            if (e.getKey() == t || (e.getKey().getValue() == t.getValue() && e.getKey().getWeight() == t.getWeight())) {
+                return e.getValue();
+            }
+        }
+        return null;
+    }
 
     @Override
     public int size() {
@@ -590,7 +636,7 @@ public final class BFSLabyrinth implements Labyrinth {
     public BFSLabyrinth(Map<Coords, ? extends Tile> labyrinth) {
         for (Map.Entry<Coords, ? extends Tile> e : labyrinth.entrySet()) {
             final Tile tile = e.getValue();
-            if (e.getValue() instanceof Treasure) {
+            if (Treasure.class.isAssignableFrom(e.getValue().getClass())) {
                 final Treasure treasure = (Treasure) e.getValue();
                 map.put(e.getKey(), new TileWithTreasure() {
                     @Override
@@ -608,6 +654,7 @@ public final class BFSLabyrinth implements Labyrinth {
                         return treasure.getWeight();
                     }
                 });
+                treasureMap.put(treasure, e.getKey());
             } else {
                 map.put(e.getKey(), new Tile() {
                     @Override
