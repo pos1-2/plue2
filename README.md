@@ -255,7 +255,7 @@ Direction f = e.getOppositeDirection(); // f == Left
 
 Implementieren Sie
 ```
-void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file)
+void printReportForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file)
 ```
 Diese Methode bekommt das `labyrinth`, einen `path` durch selbiges, und ein `file`.
 

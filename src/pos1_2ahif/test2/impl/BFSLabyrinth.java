@@ -15,7 +15,7 @@ public final class BFSLabyrinth implements Labyrinth {
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
         if (!e.hasAnyTreasure(this)) {
             printSavingMessage(report);
-            e.printPlanForTreasureHunt(this, Collections.<Direction>emptyList(), report);
+            e.printReportForTreasureHunt(this, Collections.<Direction>emptyList(), report);
             return Collections.emptyList();
         }
 
@@ -47,7 +47,7 @@ public final class BFSLabyrinth implements Labyrinth {
         e.clearPassagesAlongPath(this, path);
 
         printSavingMessage(report);
-        e.printPlanForTreasureHunt(this, path, report);
+        e.printReportForTreasureHunt(this, path, report);
 
         return path;
     }

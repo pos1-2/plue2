@@ -27,5 +27,5 @@ public interface Exercises {
     void clearPassagesAlongPath(Labyrinth labyrinth, List<Direction> path);
 
     // 6
-    void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
+    void printReportForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file);
 }

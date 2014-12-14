@@ -54,7 +54,7 @@ public class Solution implements Exercises {
     }
 
     @Override
-    public void printPlanForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file) {
-        referenceSolution.printPlanForTreasureHunt(labyrinth, path, file);
+    public void printReportForTreasureHunt(Labyrinth labyrinth, List<Direction> path, File file) {
+        referenceSolution.printReportForTreasureHunt(labyrinth, path, file);
     }
 }
