@@ -13,14 +13,22 @@ public final class BFSLabyrinth implements Labyrinth {
     // see here, how your interface is used:
     @Override
     public List<Direction> explore(Exercises e, float carryCapacity, File report) {
-        if (!e.hasAnyTreasure(this)) {
+        boolean hasAnyTreasure = e.hasAnyTreasure(this);
+        checkWithReferenceSolution(hasAnyTreasure);
+        if (!hasAnyTreasure) {
+            System.out.println("No treasure found - going home...");
             printSavingMessage(report);
             e.printReportForTreasureHunt(this, Collections.<Direction>emptyList(), report);
             return Collections.emptyList();
         }
 
+        System.out.println("There is some treasure! Let's go get it...");
+
         List<Treasure> treasuresOrderedByValue = e.getTreasuresOrderedByValue(this);
+        checkWithReferenceSolutionOrdereByValue(treasuresOrderedByValue);
+
         List<Treasure> treasuresOrderedByValuePerWeight = e.getTreasuresOrderedByValuePerWeight(this);
+        checkWithReferenceSolutionOrderedByValuePerWeight(treasuresOrderedByValuePerWeight);
 
         List<Coords> pathCoordsForValue = new LinkedList<Coords>();
         List<Coords> pathCoordsForValuePerWeight = new LinkedList<Coords>();
@@ -41,20 +49,151 @@ public final class BFSLabyrinth implements Labyrinth {
 
         if (treasuresCollectedWhenPrioritizingValue > treasuresCollectedWhenPrioritizingValuePerWeight) {
             betterPathCoords = pathCoordsForValue;
+            System.out.println("It is decided! We are going for the more __valuable__ Treasures!");
         } else {
             betterPathCoords = pathCoordsForValuePerWeight;
+            System.out.println("It is decided! We are going for the more __lightweight__ Treasures!");
         }
 
         List<List<Direction>> betterPlan = planRoutes(betterPathCoords);
 
+        System.out.println("Can you please create the master plan for us? Here is our plan so far: " + betterPlan);
         List<Direction> path = e.joinPaths(betterPlan);
+        checkWithReferenceSolutionJoin(path, betterPlan);
+        System.out.println("Your master plan looks really nice: " + path);
 
         e.clearPassagesAlongPath(this, path);
+        checkWithReferenceSolutionKaboom(path);
+        System.out.println("WE DID IT! TREASURE, HERE WE COME!");
 
         printSavingMessage(report);
         e.printReportForTreasureHunt(this, path, report);
 
         return path;
+    }
+
+    // -- no need to read further, not relevant for exercise!
+    private void checkWithReferenceSolutionKaboom(List<Direction> path) {
+        REFERENCE.clearPassagesAlongPath(new Labyrinth() {
+            @Override
+            public void clearPassages(Map<Coords, Tile> modifiedTiles) {
+                printWarning("clearPassagesAlongPath", "There is no wall between: " + modifiedTiles.keySet(), "The wall between " + modifiedTiles.keySet() + " must be destroyed!");
+            }
+
+            @Override
+            public String toString(List<Direction> path) {
+                return BFSLabyrinth.this.toString(path);
+            }
+
+            @Override
+            public List<Direction> explore(Exercises e, float carryCapacity, File report) {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public int size() {
+                return BFSLabyrinth.this.size();
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return BFSLabyrinth.this.isEmpty();
+            }
+
+            @Override
+            public boolean containsKey(Object key) {
+                return BFSLabyrinth.this.containsKey(key);
+            }
+
+            @Override
+            public boolean containsValue(Object value) {
+                return BFSLabyrinth.this.containsValue(value);
+            }
+
+            @Override
+            public Tile get(Object key) {
+                return BFSLabyrinth.this.get(key);
+            }
+
+            @Override
+            public Tile put(Coords key, Tile value) {
+                return BFSLabyrinth.this.put(key, value);
+            }
+
+            @Override
+            public Tile remove(Object key) {
+                return BFSLabyrinth.this.remove(key);
+            }
+
+            @Override
+            public void putAll(Map<? extends Coords, ? extends Tile> m) {
+                BFSLabyrinth.this.putAll(m);
+            }
+
+            @Override
+            public void clear() {
+                BFSLabyrinth.this.clear();
+            }
+
+            @Override
+            public Set<Coords> keySet() {
+                return BFSLabyrinth.this.keySet();
+            }
+
+            @Override
+            public Collection<Tile> values() {
+                return BFSLabyrinth.this.values();
+            }
+
+            @Override
+            public Set<Entry<Coords, Tile>> entrySet() {
+                return BFSLabyrinth.this.entrySet();
+            }
+        }, path);
+    }
+
+    private void checkWithReferenceSolutionJoin(List<Direction> testee, List<List<Direction>> betterPlan) {
+        List<Direction> ref = REFERENCE.joinPaths(betterPlan);
+        if (!ref.equals(testee)) {
+            printWarning("joinPaths", testee.toString(), ref.toString());
+        }
+    }
+
+    private void checkWithReferenceSolutionOrderedByValuePerWeight(List<Treasure> treasuresOrderedByValuePerWeight) {
+        checkWithReferenceSolutionTreasures("getTreasuresOrderedByValuePerWeight", treasuresOrderedByValuePerWeight, REFERENCE.getTreasuresOrderedByValuePerWeight(this));
+    }
+
+    private void checkWithReferenceSolutionOrdereByValue(List<Treasure> treasuresOrderedByValue) {
+        checkWithReferenceSolutionTreasures("getTreasuresOrderedByValue", treasuresOrderedByValue, REFERENCE.getTreasuresOrderedByValue(this));
+    }
+
+    private void checkWithReferenceSolutionTreasures(String label, List<Treasure> testee, List<Treasure> reference) {
+        List<TreasureContainer> transformedTestee = new ArrayList<TreasureContainer>();
+        for (Treasure t : testee) {
+            transformedTestee.add(TreasureContainer.copy(t));
+        }
+        List<TreasureContainer> transformedReference = new ArrayList<TreasureContainer>();
+        for (Treasure t : reference) {
+            transformedReference.add(TreasureContainer.copy(t));
+        }
+        if (!transformedTestee.equals(transformedReference)) {
+            printWarning(label, transformedTestee.toString(), transformedReference.toString());
+        }
+    }
+
+    private void checkWithReferenceSolution(boolean hasAnyTreasure) {
+        boolean ref = REFERENCE.hasAnyTreasure(this);
+        if (hasAnyTreasure != ref) {
+            printWarning("hasAnyTreasure", Boolean.toString(hasAnyTreasure), Boolean.toString(ref));
+        }
+    }
+
+    private void printWarning(String label, String testee, String reference) {
+        System.out.println();
+        System.out.println("WARNING: " + label);
+        System.out.println("Your implementation says:      " + testee);
+        System.out.println("Reference implementation says: " + reference);
+        System.out.println();
     }
 
     private List<List<Direction>> planRoutes(List<Coords> betterCoords) {
@@ -101,7 +240,6 @@ public final class BFSLabyrinth implements Labyrinth {
         });
     }
 
-    // -- no need to read further, not relevant for exercise!
     private void printSavingMessage(File file) {
         System.out.println("Saving " + file.getAbsolutePath() + "...");
     }
@@ -303,6 +441,7 @@ public final class BFSLabyrinth implements Labyrinth {
         }
 
         map.putAll(modifiedTiles);
+        System.out.println("KABOOM!! (on coords: " + modifiedTiles.keySet() + ")");
     }
 
     private void checkValidUpdate(Coords c, Map<Coords, Tile> modifiedTiles) {
@@ -317,11 +456,19 @@ public final class BFSLabyrinth implements Labyrinth {
         final Tile otherTile = modifiedTiles.containsKey(neighbor) ? modifiedTiles.get(neighbor) : get(neighbor);
 
         if (base == null) {
-            throw new IllegalArgumentException("You cannot set the tile at " + base + " to be empty!");
+            throw new IllegalArgumentException("You provided 'null' as coords! Please provide __real__ coords!");
         }
 
-        if (oldBaseTile == null) {
-            throw new IllegalArgumentException("You cannot add a new tile at " + base + " to the labyrinth");
+        if (oldBaseTile == null && baseTile == null) {
+            throw new IllegalArgumentException("This update is not necessary: " + base + " was empty before - and you want to set it to 'null' (it already was 'null')!");
+        }
+
+        if (oldBaseTile != null && baseTile == null) {
+            throw new IllegalArgumentException(base + " was __not__ empty before! One cannot simply set the tile at " + base + " to be empty!");
+        }
+
+        if (oldBaseTile == null && baseTile != null) {
+            throw new IllegalArgumentException(base + " was empty before! One cannot simply add a new tile at " + base + " to the labyrinth");
         }
 
         if (oldBaseTile.isDirectionOpen(baseDir) && !baseTile.isDirectionOpen(baseDir)) {
@@ -330,7 +477,7 @@ public final class BFSLabyrinth implements Labyrinth {
 
         if (!(
                 (!baseTile.isDirectionOpen(baseDir) && otherTile == null)
-                        || baseTile.isDirectionOpen(baseDir) == otherTile.isDirectionOpen(neighborDir))) {
+                        || otherTile != null && baseTile.isDirectionOpen(baseDir) == otherTile.isDirectionOpen(neighborDir))) {
             throw new IllegalArgumentException("Tiles do not match at " + base + " and " + neighbor + "! Did you check to open up the passage from both directions?");
         }
     }
@@ -339,14 +486,76 @@ public final class BFSLabyrinth implements Labyrinth {
     private Map<Coords, Tile> unmodifiableMap = Collections.unmodifiableMap(map);
     private Map<Treasure, Coords> treasureMap = new HashMap<Treasure, Coords>();
 
-    public Coords getCoordsForTreasure(Treasure t) {
+    private Coords getCoordsForTreasure(Treasure treasure) {
         for (Map.Entry<Treasure, Coords> e : treasureMap.entrySet()) {
-            if (e.getKey() == t || (e.getKey().getValue() == t.getValue() && e.getKey().getWeight() == t.getWeight())) {
+            if (treasureEquals(treasure, e.getKey())) {
                 return e.getValue();
             }
         }
         return null;
     }
+
+    private static boolean treasureEquals(Treasure t1, Treasure t2) {
+        return t2 == t1 || t1 != null && t2 != null && new TreasureContainer(t1).equals(new TreasureContainer(t2));
+    }
+
+    private static class TreasureContainer implements Treasure {
+        private float value;
+        private float weight;
+
+        private static TreasureContainer copy(Treasure other) {
+            if (other == null) {
+                return null;
+            } else {
+                return new TreasureContainer(other);
+            }
+        }
+
+        private TreasureContainer(Treasure other) {
+            this.value = other.getValue();
+            this.weight = other.getWeight();
+        }
+
+        @Override
+        public float getValue() {
+            return value;
+        }
+
+        @Override
+        public float getWeight() {
+            return weight;
+        }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "value:" + value +
+                    " weight:" + weight +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            TreasureContainer that = (TreasureContainer) o;
+
+            if (Float.compare(that.value, value) != 0) return false;
+            if (Float.compare(that.weight, weight) != 0) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (value != +0.0f ? Float.floatToIntBits(value) : 0);
+            result = 31 * result + (weight != +0.0f ? Float.floatToIntBits(weight) : 0);
+            return result;
+        }
+    }
+
+    private static final Exercises REFERENCE = Assets.getReferenceSolution();
 
     @Override
     public int size() {

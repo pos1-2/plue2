@@ -217,7 +217,7 @@ public final class Assets {
             put(c(4, 1), t(0, 1, 1, 0));
         }}));
 
-        labs.put("l35x15-treasure-4-8--3-1--13-1--2-1--1-1-and-1-7", new BFSLabyrinth(new HashMap<Coords, Tile>() {{
+        labs.put("l35x15-treasure-14-8--3-1--13-1--2-1--1-1-and-1-7", new BFSLabyrinth(new HashMap<Coords, Tile>() {{
             put(c(0, 0), t(1, 1, 1, 1));
             put(c(0, -1), t(1, 0, 0, 1));
             put(c(33, 1), t(1, 0, 0, 1));
@@ -641,7 +641,7 @@ public final class Assets {
             put(c(32, 0), t(0, 1, 0, 1));
             put(c(32, 1), t(0, 1, 1, 0));
             put(c(32, 2), t(0, 0, 0, 1));
-            put(c(32, 3), t(1, 1, 1, 1, 4.0f, 8.0f));
+            put(c(32, 3), t(1, 1, 1, 1, 14.0f, 8.0f));
             put(c(32, 4), t(0, 0, 1, 0));
             put(c(33, -6), t(1, 0, 0, 1));
             put(c(33, -5), t(1, 0, 1, 0));
